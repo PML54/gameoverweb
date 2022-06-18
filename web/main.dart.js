@@ -67559,7 +67559,7 @@ s=A.dn(B.m,o.k2,30,new A.ac3(o),"Lock Memes")
 r=A.dn(B.m,o.k3,30,new A.ac4(o),"Lock Photos")
 q=o.p2
 p=t.p
-q=A.mh(A.b([A.d2(A.bR(A.b([m,s,r,A.lU(A.dn(B.T,B.Ba,30,new A.ac5(o),"Favori"),q),A.dn(B.FJ,B.B6,35,new A.ac6(o),"Save Meme+ Add favori")],p),B.t,B.r))],p),n)
+q=A.mh(A.b([A.d2(A.bR(A.b([m,s,r,A.lU(A.dn(B.T,B.Ba,30,new A.ac5(o),"Favori"),q),A.dn(B.FJ,B.B6,35,new A.ac6(o),"Save Meme")],p),B.t,B.r))],p),n)
 r=o.r
 return A.qy(!0,A.nX(q,A.nV(!0,A.fL(A.b([A.lU(o.OC(),r),o.nF()],p),B.t,B.aq,B.r),B.P,!0),A.bR(A.b([A.dn(B.FK,B.B8,35,new A.ac7(o),"Categories"),A.dn(B.aN,B.Bb,35,new A.ac8(o),"Caption"),A.dn(B.T,B.B7,50,new A.ac9(o),"Photo Random"),A.dn(B.aN,B.e4,35,new A.aca(o),"Prev"),A.dn(B.aN,B.mY,35,new A.acb(o),"Next")],p),B.t,B.r)),"")},
 CX(){this.I(new A.acz(this))},
