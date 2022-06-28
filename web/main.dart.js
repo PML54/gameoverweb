@@ -68560,10 +68560,10 @@ $S:0}
 A.xy.prototype={
 ar(){return new A.NF(A.b([],t.FV),new A.G8("myPseudo",0),B.m)}}
 A.NF.prototype={
-P(a,b){var s,r,q,p,o,n,m=this,l=null,k=A.iy(l,A.b6(" 0927:1800 LAMEMOPOLE : "+m.w.b,l,l,l,A.eC(18),l,l)),j=t.w,i=b.S(j).f
+P(a,b){var s,r,q,p,o,n,m=this,l=null,k=A.iy(l,A.b6(" 0928:0915 LAMEMOPOLE : "+m.w.b,l,l,l,A.eC(18),l,l)),j=t.w,i=b.S(j).f
 j=b.S(j).f
 s=m.e
-s=A.dY(new A.bm(B.aw,A.bY(A.b6("ACCESS CONTROL",l,l,l,A.eC(30),l,l),new A.adv(m,b),l),l),!s)
+s=A.dY(new A.bm(B.aw,A.bY(A.b6("CONNEXION",l,l,l,A.eC(30),l,l),new A.adv(m,b),l),l),!s)
 r=m.e
 r=A.dY(new A.bm(B.aw,A.bY(A.b6("GAME   ",l,l,l,A.eC(25),l,l),new A.adw(b),l),l),r)
 q=m.e
