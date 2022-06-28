@@ -68563,7 +68563,7 @@ A.NF.prototype={
 P(a,b){var s,r,q,p,o,n,m=this,l=null,k=A.iy(l,A.b6(" 0928:0915 LAMEMOPOLE : "+m.w.b,l,l,l,A.eC(18),l,l)),j=t.w,i=b.S(j).f
 j=b.S(j).f
 s=m.e
-s=A.dY(new A.bm(B.aw,A.bY(A.b6("CONNEXION",l,l,l,A.eC(30),l,l),new A.adv(m,b),l),l),!s)
+s=A.dY(new A.bm(B.aw,A.bY(A.b6("CONNEXION",l,l,l,A.eC(27),l,l),new A.adv(m,b),l),l),!s)
 r=m.e
 r=A.dY(new A.bm(B.aw,A.bY(A.b6("GAME   ",l,l,l,A.eC(25),l,l),new A.adw(b),l),l),r)
 q=m.e
@@ -68576,7 +68576,7 @@ o=A.bn(A.b([r,A.dY(new A.bm(B.aw,A.bY(A.b6("FAVORI",l,l,l,A.eC(25),l,l),new A.ad
 r=m.d
 r=A.dY(new A.bm(B.aw,A.bY(A.b6("ADMIN",l,l,l,A.eC(30),l,l),new A.adA(b),l),l),r)
 n=m.e
-return A.hk(k,A.a4i(A.bk(l,new A.bm(B.fO,A.dy(A.b([s,q,o,r,A.dY(new A.bm(B.aw,A.bY(A.b6("NEW GAMER",l,l,l,A.eC(30),l,l),new A.adB(b),l),l),!n)],p),B.e9,B.V,B.o),l),l,new A.aC(0,1/0,i.a.b,1/0),B.cV,l,l,B.co,j.a.a)),A.dY(A.bN(B.ay,B.nw,35,new A.adC(m),"Unused"),!1))},
+return A.hk(k,A.a4i(A.bk(l,new A.bm(B.fO,A.dy(A.b([s,q,o,r,A.dY(new A.bm(B.aw,A.bY(A.b6("NEW GAMER",l,l,l,A.eC(26),l,l),new A.adB(b),l),l),!n)],p),B.e9,B.V,B.o),l),l,new A.aC(0,1/0,i.a.b,1/0),B.cV,l,l,B.co,j.a.a)),A.dY(A.bN(B.ay,B.nw,35,new A.adC(m),"Unused"),!1))},
 aC(){this.aU()
 this.G(new A.adD(this))}}
 A.adv.prototype={
