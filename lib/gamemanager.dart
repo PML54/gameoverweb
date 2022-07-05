@@ -441,11 +441,8 @@ class _GameManagerState extends State<GameManager> {
     PhlCommons.gameActif.gametimevote = _gameTimeVote;
     PhlCommons.gameActif.gametimer = _gameTimer;
     PhlCommons.gameActif.gameopen = _gameOpen;
-    //  gameid: -1,
   }
   Future newGame() async {
-
-
     int _gameStatus = 1; // PHOTOCLOSED
     int _gameNbGamersActifs = 0;
     int _gameFilter = 0;

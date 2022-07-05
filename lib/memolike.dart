@@ -1,3 +1,6 @@
+// FAVORI
+// 5 Juillet
+//  Lire  les Favoris et in les Note
 import 'dart:convert';
 import 'dart:core';
 
@@ -22,11 +25,14 @@ class _MemolikeState extends State<Memolike> {
   bool myBool = false;
   String ipv4name = "**.**.**";
   String memeLegende = "";
-  bool getMemolikeState = false;
+  bool readMemolikeState = false;
+  bool readMemolikeVoteState = false;
+  bool listCheckMlvuState=false;
   int getMemolikeError = 0;
   List<MemoLike> listMemoLike = [];
   List<int> listCountEmo = [];
   List<CheckVotePlus> listCheckVote = [];
+  List<CheckMLVU>listCheckMlvu = [];
   int thatFavori = 1;
   int cestCeluiLa = 0;
   bool repaintPRL = true;
@@ -87,7 +93,9 @@ class _MemolikeState extends State<Memolike> {
             ),
           ),
         ]),
-        body: getMemolikeState
+
+        //body: readMemolikeVoteState
+        body: readMemolikeState
             ? SafeArea(
                 child: Column(children: <Widget>[
                   Container(
@@ -105,85 +113,89 @@ class _MemolikeState extends State<Memolike> {
                           listMemoLike[cestCeluiLa].photofiletype,
                     ),
                   ),
-                  Row(children: <Widget>[
-                    //🤣
-                    Column(
-                      children: [
-                        TextButton(
-                          onPressed: () => {pressEmoticone(myUid, 0)},
-                          child: const Text(
-                            '🙁',
-                            style: TextStyle(fontSize: 22),
-                          ),
-                        ),
-                        Text((listCountEmo[0]).toString())
-                      ],
-                    ),
-                    Column(
-                      children: [
-                        TextButton(
-                          onPressed: () => {pressEmoticone(myUid, 1)},
-                          child: const Text(
-                            '😐',
-                            style: TextStyle(fontSize: 22),
-                          ),
-                        ),
-                        Text((listCountEmo[1]).toString())
-                      ],
-                    ),
-                    Column(
-                      children: [
-                        TextButton(
-                          onPressed: () => {pressEmoticone(myUid, 2)},
-                          child: const Text(
-                            '🙂',
-                            style: TextStyle(fontSize: 22),
-                          ),
-                        ),
-                        Text((listCountEmo[2]).toString())
-                      ],
-                    ),
-                    Column(
-                      children: [
-                        TextButton(
-                          onPressed: () => {pressEmoticone(myUid, 3)},
-                          child: const Text(
-                            '😄',
-                            style: TextStyle(fontSize: 22),
-                          ),
-                        ),
-                        Text((listCountEmo[3]).toString())
-                      ],
-                    ),
-                    Column(
-                      children: [
-                        TextButton(
-                          onPressed: () => {pressEmoticone(myUid, 4)},
-                          child: const Text(
-                            '😆',
-                            style: TextStyle(fontSize: 22),
-                          ),
-                        ),
-                        Text((listCountEmo[4]).toString())
-                      ],
-                    ),
-                    Column(
-                      children: [
-                        TextButton(
-                          onPressed: () => {pressEmoticone(myUid, 5)},
-                          child: const Text(
-                            '🤣',
-                            style: TextStyle(fontSize: 22),
-                          ),
-                        ),
-                        Text((listCountEmo[5]).toString())
-                      ],
-                    ),
-                  ]),
-                Center(child: Text('By '+listMemoLike[cestCeluiLa].memolikeuser)),
-
+                  readMemolikeVoteState
+                      ? Row(
+                          children: <Widget>[
+                            //🤣
+                            Column(
+                              children: [
+                                TextButton(
+                                  onPressed: () => {pressEmoticone(myUid, 0)},
+                                  child: const Text(
+                                    '🙁',
+                                    style: TextStyle(fontSize: 22),
+                                  ),
+                                ),
+                                Text((listCountEmo[0]).toString())
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                TextButton(
+                                  onPressed: () => {pressEmoticone(myUid, 1)},
+                                  child: const Text(
+                                    '😐',
+                                    style: TextStyle(fontSize: 22),
+                                  ),
+                                ),
+                                Text((listCountEmo[1]).toString())
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                TextButton(
+                                  onPressed: () => {pressEmoticone(myUid, 2)},
+                                  child: const Text(
+                                    '🙂',
+                                    style: TextStyle(fontSize: 22),
+                                  ),
+                                ),
+                                Text((listCountEmo[2]).toString())
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                TextButton(
+                                  onPressed: () => {pressEmoticone(myUid, 3)},
+                                  child: const Text(
+                                    '😄',
+                                    style: TextStyle(fontSize: 22),
+                                  ),
+                                ),
+                                Text((listCountEmo[3]).toString())
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                TextButton(
+                                  onPressed: () => {pressEmoticone(myUid, 4)},
+                                  child: const Text(
+                                    '😆',
+                                    style: TextStyle(fontSize: 22),
+                                  ),
+                                ),
+                                Text((listCountEmo[4]).toString())
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                TextButton(
+                                  onPressed: () => {pressEmoticone(myUid, 5)},
+                                  child: const Text(
+                                    '🤣',
+                                    style: TextStyle(fontSize: 22),
+                                  ),
+                                ),
+                                Text((listCountEmo[5]).toString())
+                              ],
+                            )
+                          ],
+                        )
+                      : Text('...'),
+                  Center(
+                      child:
+                          Text('By ' + listMemoLike[cestCeluiLa].memolikeuser)),
                 ]),
-
               )
             : Text(''),
         bottomNavigationBar: Row(children: [
@@ -194,8 +206,6 @@ class _MemolikeState extends State<Memolike> {
               tooltip: 'Prev',
               onPressed: () {
                 prevPRL();
-                //createMeme();
-                //stopTimer();
               }),
           Text(
             (cestCeluiLa + 1).toString() + '/' + listMemoLike.length.toString(),
@@ -210,10 +220,6 @@ class _MemolikeState extends State<Memolike> {
                 nextPRL();
               }),
           Text(
-            " Uid =" + myPerso.myUid.toString(),
-            style: GoogleFonts.averageSans(fontSize: 18.0),
-          ),
-          Text(
             " Moyenne = " + thatAverage.toString(),
             style: GoogleFonts.averageSans(fontSize: 15.0),
           ),
@@ -224,7 +230,6 @@ class _MemolikeState extends State<Memolike> {
 
   Future createMemolikeVote(int _myUid, int _points) async {
     Uri url = Uri.parse(pathPHP + "createMLV.php");
-
     var data = {
       "MLVPOINTS": _points.toString(),
       "MLVDATE": now.toString(),
@@ -234,6 +239,7 @@ class _MemolikeState extends State<Memolike> {
     var res = await http.post(url, body: data);
     var datamysql = jsonDecode(res.body) as List;
     setState(() {
+      getMLVU();
       listCheckVote =
           datamysql.map((xJson) => CheckVotePlus.fromJson(xJson)).toList();
       updateThisMli(listMemoLike[cestCeluiLa].memolikeid);
@@ -244,29 +250,8 @@ class _MemolikeState extends State<Memolike> {
 
   Future getIP() async {
     final ipv4 = await Ipify.ipv4();
-
     setState(() {
       ipv4name = ipv4;
-    });
-  }
-
-  Future getMemolikeVote() async {
-    Uri url = Uri.parse(pathPHP + "getMLV.php");
-    var data = {
-      "MEMOLIKEID": listMemoLike[cestCeluiLa].memolikeid.toString(),
-    };
-
-    var res = await http.post(url, body: data);
-    var datamysql = jsonDecode(res.body) as List;
-    setState(() {
-
-      listCheckVote =
-          datamysql.map((xJson) => CheckVotePlus.fromJson(xJson)).toList();
-
-
-      thatAverage =
-          (updateThisMli(listMemoLike[cestCeluiLa].memolikeid)).toDouble();
-
     });
   }
 
@@ -275,11 +260,22 @@ class _MemolikeState extends State<Memolike> {
     super.initState();
     cestCeluiLa = 0;
     getIP();
-    readMemolike();
+    readMemolike(); // Seule Lecture directe
+
     listCountEmo.clear();
     for (int i = 0; i < 6; i++) {
       listCountEmo.add(0);
     }
+
+    setState(() {
+      if (readMemolikeState) {
+        if (readMemolikeVoteState) {
+          updateThisMli(listMemoLike[cestCeluiLa].memolikeid);
+          repaintPRL = true;
+        }
+        ;
+      }
+    });
   }
 
   nextPRL() {
@@ -292,7 +288,7 @@ class _MemolikeState extends State<Memolike> {
         cestCeluiLa = listMemoLike.length - 1;
       }
 
-      getMemolikeVote();
+      readMemolikeVote();
       repaintPRL = true;
       updateThisMli(listMemoLike[cestCeluiLa].memolikeid);
     });
@@ -309,10 +305,9 @@ class _MemolikeState extends State<Memolike> {
       thatSum = 0;
       thatCount = 0;
       booLike = false;
-
       cestCeluiLa--;
       if (cestCeluiLa < 0) cestCeluiLa = 0;
-      getMemolikeVote();
+      readMemolikeVote();
       repaintPRL = true;
       updateThisMli(listMemoLike[cestCeluiLa].memolikeid);
     });
@@ -320,7 +315,7 @@ class _MemolikeState extends State<Memolike> {
 
   Future readMemolike() async {
     Uri url = Uri.parse(pathPHP + "readMEMOLIKE.php");
-    getMemolikeState = false;
+    readMemolikeState = false;
     http.Response response = await http.post(url);
     if (response.body.toString() == 'ERR_1001') {
       getMemolikeError = 1001; //Not Found
@@ -331,12 +326,34 @@ class _MemolikeState extends State<Memolike> {
         getMemolikeError = 0;
         listMemoLike =
             datamysql.map((xJson) => MemoLike.fromJson(xJson)).toList();
-        getMemolikeState = true;
+        readMemolikeState = true;
+        readMemolikeVote();
+        print("  readMemolikeState" + readMemolikeState.toString());
       });
     } else {}
   }
 
+  Future readMemolikeVote() async {
+    Uri url = Uri.parse(pathPHP + "getMLV.php");
+    readMemolikeVoteState = false;
+    var data = {
+      "MEMOLIKEID": listMemoLike[cestCeluiLa].memolikeid.toString(),
+    };
+    print("MEMOLIKEID = " + listMemoLike[cestCeluiLa].memolikeid.toString());
+    var res = await http.post(url, body: data);
+    var datamysql = jsonDecode(res.body) as List;
+    setState(() {
+      listCheckVote =
+          datamysql.map((xJson) => CheckVotePlus.fromJson(xJson)).toList();
+      readMemolikeVoteState = true;
+      print("  readMemolikeVoteState" + readMemolikeVoteState.toString());
+      thatAverage =
+          (updateThisMli(listMemoLike[cestCeluiLa].memolikeid)).toDouble();
+    });
+  }
+
   int updateThisMli(int _memolikeid) {
+    // Repartion  des Like
     int _thatNote = 0;
     int inote = 0;
     listCountEmo.clear();
@@ -352,7 +369,27 @@ class _MemolikeState extends State<Memolike> {
       }
     }
     if (inote == 0) inote = 1;
-    int calcul = (_thatNote * 10 / inote).toInt();
+    int calcul = _thatNote * 10 ~/ inote;
     return (calcul);
   }
+//CheckMLVU
+  Future getMLVU() async {
+    Uri url = Uri.parse(pathPHP + "getMLVU.php");
+    listCheckMlvuState=false;
+
+    http.Response response = await http.post(url);
+    if (response.body.toString() == 'ERR_1001') {
+
+    }
+    if (response.statusCode == 200 && (getMemolikeError != 1001)) {
+      var datamysql = jsonDecode(response.body) as List;
+      setState(() {
+
+        listCheckMlvu =
+            datamysql.map((xJson) => CheckMLVU.fromJson(xJson)).toList();
+        listCheckMlvuState=true;
+      });
+    } else {}
+  }
+
 }

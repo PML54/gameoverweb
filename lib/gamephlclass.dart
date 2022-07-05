@@ -462,3 +462,29 @@ required this.cumu
 
 
 }
+
+
+
+class CheckMLVU {
+ //"SELECT MEMOLIKEID,UID, MLVPOINTS  from MEMOLIKEVOTE  order by MEMOLIKEID";
+  int memolikeid = 0;
+  int mlvpoints =0;
+  int uid=0; //nb Votes avec cette nore
+
+  CheckMLVU({
+    required this.memolikeid,
+    required this.mlvpoints,
+    required this.uid,
+  });
+
+  factory CheckMLVU.fromJson(Map<String, dynamic> json) {
+    return CheckMLVU(
+      memolikeid: int.parse(json['MEMOLIKEID']),
+      mlvpoints: int.parse(json['MLVPOINTS']),
+      uid: int.parse(json['UID']),
+
+    );
+  }
+
+
+}

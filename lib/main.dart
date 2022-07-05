@@ -29,7 +29,7 @@ GameCommons myPerso = new GameCommons("xxxx", 0,0) ;
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          ' 0702 LAMEMOPOLE ' + myPerso.myPseudo,
+          ' 0705 LAMEMOPOLE ' + myPerso.myPseudo,
           style: GoogleFonts.averageSans(fontSize: 18.0),
         ),
       ),
@@ -77,7 +77,7 @@ GameCommons myPerso = new GameCommons("xxxx", 0,0) ;
                         ));
                         setState(() {
                           connectedGuy = listMemopolUsers[0].uname;
-                          print ('connectedGuy'+connectedGuy);
+
 
                           if (listMemopolUsers[0].uprofile & 128 == 128) {
                             isAdmin = true;
