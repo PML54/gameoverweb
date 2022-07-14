@@ -1,53 +1,49 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:core';
-import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:gameover/configgamephl.dart';
 import 'package:gameover/gamephlclass.dart';
 import 'package:gameover/phlcommons.dart';
 import 'package:http/http.dart' as http;
+
 class GameUser extends StatefulWidget {
-  GameUser({Key? key}) : super(key: key);
+  const GameUser({Key? key}) : super(key: key);
 
   @override
   State<GameUser> createState() => _GameUserState();
 }
 
 class _GameUserState extends State<GameUser> {
+  GameCommons myPerso = GameCommons("xxxx", 0, 0);
   bool myBool = false;
   bool feuOrange = true;
-
-  bool getGamebyCodeState = false;
-  int getGamebyCodeError = -1;
   List<Games> myGuGame = []; //  only one Games
-
   bool getGamePhotoSelectState = false;
   int getGamePhotoSelectError = -1;
   List<PhotoBase> listPhotoBase = [];
-
   bool getGameUserState = false;
   int getGameUserError = -1;
   List<GameUsers> listGuy = [];
-
-
   bool getMemeUserState = false;
   int getMemeUserError = -1;
   List<Memes> myGuMeme = [];
-
-
+  bool getGamebyUidState = false;
+  int getGamebyUidError = 0;
+  List<GameByUser> myGames = [];
   bool createMemeState = false;
   int createMemeError = -1;
-
-  //
-
   int totalSeconds = 0;
   TextEditingController legendeController = TextEditingController();
- 
   String thatPseudo = PhlCommons.thatPseudo;
   String memeLegende = "";
   bool timeOut = false;
   int timerMemeGame = 0;
   int cestCeluiLa = 0;
+  bool getGamebyCodeState = false;
+  int getGamebyCodeError = 0;
+  bool changeStatusGameUserState = false;
 
   //  Chrono
   Duration countdownDuration = const Duration(seconds: 40);
@@ -55,8 +51,23 @@ class _GameUserState extends State<GameUser> {
   Timer? timer;
   bool countDown = true;
 
+  void addTime() {
+    final addSeconds = countDown ? -1 : 1;
+    setState(() {
+      final seconds = duration.inSeconds + addSeconds;
+      if (seconds < 0) {
+        timer?.cancel();
+        timeOut = true;
+      } else {
+        duration = Duration(seconds: seconds);
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    myPerso = ModalRoute.of(context)!.settings.arguments as GameCommons;
+
     return MaterialApp(
         home: Scaffold(
       appBar: AppBar(actions: <Widget>[
@@ -83,8 +94,11 @@ class _GameUserState extends State<GameUser> {
                           fontSize: 14,
                           backgroundColor: Colors.red,
                           fontWeight: FontWeight.bold)),
-                  child: Text(thatPseudo)),
-              Text(totalSeconds.toString())
+                  child: Text(myPerso.myPseudo)),
+              Text(PhlCommons.thisGameCode.toString() +
+                  '   ' +
+                  totalSeconds.toString() +
+                  's')
             ],
           ),
         ),
@@ -97,7 +111,8 @@ class _GameUserState extends State<GameUser> {
         ]),
       ),
       bottomNavigationBar: Visibility(
-        visible: !timeOut,
+        // visible: !timeOut,
+        visible: true,
         child: IconButton(
             icon: const Icon(Icons.save),
             iconSize: 35,
@@ -106,20 +121,54 @@ class _GameUserState extends State<GameUser> {
             onPressed: () {
               createMeme();
               stopTimer();
+              changeStatusGameUser(2);
+              Navigator.pop(context);
             }),
       ),
     ));
   }
 
+  buildTime() {
+    totalSeconds = duration.inMinutes * 60 + duration.inSeconds;
+  }
+
+  Future changeStatusGameUser(int _status) async {
+    Uri url = Uri.parse(pathPHP + "changeStatusGameUser.php");
+    changeStatusGameUserState = false;
+    var data = {
+      "GAMECODE": PhlCommons.thisGameCode.toString(),
+      "UID": PhlCommons.thatUid.toString(),
+      "GUSTATUS": _status.toString(),
+    };
+    await http.post(url, body: data);
+    changeStatusGameUserState = true;
+  }
+
+  Future createMeme() async {
+    Uri url = Uri.parse(pathPHP + "createMEME.php");
+    for (PhotoBase _brocky in listPhotoBase) {
+      var data = {
+        "PHOTOID": _brocky.photoid.toString(),
+        "GAMECODE": PhlCommons.thisGameCode.toString(),
+        "UID": PhlCommons.thatUid.toString(),
+        "MEMETEXT": _brocky.memetempo,
+      };
+
+      if (_brocky.memetempo.length > 1) {
+        await http.post(url, body: data);
+      }
+      //<TODO>  relecture
+    }
+  }
+
   Future getGamebyCode() async {
     int _thisGameCode = PhlCommons.thisGameCode;
     bool gameCodeFound = true;
-    Uri url = Uri.parse(pathPHP+"getGAMEBYCODE.php");
+    Uri url = Uri.parse(pathPHP + "getGAMEBYCODE.php");
     var data = {
       "GAMECODE": _thisGameCode.toString(),
     };
     http.Response response = await http.post(url, body: data);
-
     if (response.body.toString() == 'ERR_1001') {
       gameCodeFound = false;
       getGamebyCodeState = false;
@@ -137,13 +186,38 @@ class _GameUserState extends State<GameUser> {
     } else {}
   }
 
+  Future getGamebyUid() async {
+    Uri url = Uri.parse(pathPHP + "getGAMEBYUID.php");
+    var data = {
+      "UID": PhlCommons.thatUid.toString(),
+    };
+    http.Response response = await http.post(url, body: data);
+    if (response.body.toString() == 'ERR_1001') {
+      getGamebyUidState = false;
+      getGamebyUidError = 1001;
+    }
+    if (response.statusCode == 200 && (getGamebyUidError != 1001)) {
+      var datamysql = jsonDecode(response.body) as List;
+      setState(() {
+        myGames = datamysql.map((xJson) => GameByUser.fromJson(xJson)).toList();
+
+        //PhlCommons.thisGameCode = myGames.last.gamecode;
+        getGamePhotoSelect(); // Il faut le GameCore
+        getGamebyCode(); // H-eu
+        getGamebyUidState = true;
+        getGamebyUidError = 0;
+      });
+    } else {}
+  }
+
   Future getGamePhotoSelect() async {
     getGamePhotoSelectState = false;
     getGamePhotoSelectError = -1;
 
-    Uri url = Uri.parse(pathPHP+"getGAMEPHOTOS.php");
+    Uri url = Uri.parse(pathPHP + "getGAMEPHOTOS.php");
+
     var data = {
-      "GAMEID": PhlCommons.thisGameCode.toString(),
+      "GAMECODE": PhlCommons.thisGameCode.toString(),
     };
     http.Response response = await http.post(url, body: data);
     if (response.statusCode == 200) {
@@ -151,42 +225,18 @@ class _GameUserState extends State<GameUser> {
       setState(() {
         listPhotoBase =
             datamysql.map((xJson) => PhotoBase.fromJson(xJson)).toList();
-
         getGamePhotoSelectState = true;
         getGamePhotoSelectError = 0;
+        // On Empie c'est bon
+        getMemeUser();
       });
     } else {
       getGamePhotoSelectError = 2001;
     }
   }
 
-  Future getGameUser() async {
-    getGameUserState = false;
-
-    Uri url = Uri.parse(pathPHP+"getGAMEUSER.php");
-    var data = {
-      "GAMECODE": PhlCommons.thisGameCode.toString(),
-      "GUPSEUDO": PhlCommons.thatPseudo
-    };
-    http.Response response = await http.post(url, body: data);
-    getGameUserState = false;
-
-
-    if (response.statusCode == 200) {
-      var datamysql = jsonDecode(response.body) as List;
-      setState(() {
-        getGameUserState = true;
-        listGuy = datamysql.map((xJson) => GameUsers.fromJson(xJson)).toList();
-      });
-    } else {
-
-
-    }
-
-  }
-
   Expanded getget() {
-    if (!getGamePhotoSelectState) {
+    if (!getGamebyUidState || !getGamePhotoSelectState) {
       return Expanded(
         child: Column(
           children: const [
@@ -234,7 +284,7 @@ class _GameUserState extends State<GameUser> {
 
   Expanded getListView() {
     setState(() {});
-    if (!getGamebyCodeState) {
+    if (!getGamebyUidState || !getGamePhotoSelectState) {
       return (const Expanded(child: Text(".............")));
     }
     //
@@ -243,7 +293,7 @@ class _GameUserState extends State<GameUser> {
         //
         timerMemeGame = myGuGame[0].gametimememe;
         countdownDuration = Duration(seconds: timerMemeGame);
-      //  Duration duration = Duration();
+        //  Duration duration = Duration();
         reset();
         countDown = true;
         startTimer();
@@ -284,7 +334,6 @@ class _GameUserState extends State<GameUser> {
               onTap: () {
                 setState(() {
                   cestCeluiLa = index;
-
                 });
               });
         });
@@ -292,24 +341,19 @@ class _GameUserState extends State<GameUser> {
   }
 
   Future getMemeUser() async {
-    int _thisGameCode = PhlCommons.thisGameCode;
     getMemeUserState = false;
     getMemeUserError = -1;
-    Uri url = Uri.parse(pathPHP+"getMEMEBYUSER.php");
+    Uri url = Uri.parse(pathPHP + "getMEMEBYUSER.php");
     var data = {
-      "GAMECODE": _thisGameCode.toString(),
-      "GUPSEUDO": PhlCommons.thatPseudo,
+      "GAMECODE": PhlCommons.thisGameCode.toString(),
+      "UID": PhlCommons.thatUid.toString(),
     };
     http.Response response = await http.post(url, body: data);
-
     if (response.body.toString() == 'ERR_1001') {
-
       getMemeUserError = 1001;
     }
-
     if (response.statusCode == 200 && (getMemeUserError != 1001)) {
       var datamysql = jsonDecode(response.body) as List;
-
       setState(() {
         myGuMeme = datamysql.map((xJson) => Memes.fromJson(xJson)).toList();
         getMemeUserState = true;
@@ -321,29 +365,10 @@ class _GameUserState extends State<GameUser> {
   void initState() {
     super.initState();
     reset();
-
-    getGamebyCode();
-    getGamePhotoSelect();
-    getGameUser();
-    getMemeUser(); //
-  }
-
-  Future createMeme() async {
-    Uri url = Uri.parse(pathPHP+"createMEME.php");
-
-    for (PhotoBase _brocky in listPhotoBase) {
-      var data = {
-        "PHOTOID": _brocky.photoid.toString(),
-        "GAMECODE": PhlCommons.thisGameCode.toString(),
-        "GUPSEUDO": PhlCommons.thatPseudo,
-        "MEMETEXT": _brocky.memetempo,
-      };
-
-      if (_brocky.memetempo.length > 1) {
-        var res = await http.post(url, body: data);
-      }
-      //<TODO>  relecture
-    }
+    getGamebyUidState = true;
+    //getGamebyUid();
+    getGamePhotoSelect(); // Il faut le GameCore
+    getGamebyCode(); // H-eu
   }
 
   void reset() {
@@ -358,29 +383,10 @@ class _GameUserState extends State<GameUser> {
     timer = Timer.periodic(const Duration(seconds: 1), (_) => addTime());
   }
 
-  void addTime() {
-    final addSeconds = countDown ? -1 : 1;
-    setState(() {
-      final seconds = duration.inSeconds + addSeconds;
-      if (seconds < 0) {
-        timer?.cancel();
-        timeOut = true;
-      } else {
-        duration = Duration(seconds: seconds);
-      }
-    });
-  }
-
   void stopTimer({bool resets = true}) {
     if (resets) {
       reset();
     }
     setState(() => timer?.cancel());
-  }
-
-  buildTime() {
-
-    totalSeconds = duration.inMinutes * 60 + duration.inSeconds;
-
   }
 }

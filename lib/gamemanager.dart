@@ -3,25 +3,51 @@ import 'dart:convert';
 import 'dart:core';
 import 'dart:math';
 
+import 'package:clipboard/clipboard.dart';
 import 'package:flutter/material.dart';
-
 import 'package:gameover/configgamephl.dart';
 import 'package:gameover/gamephlclass.dart';
 import 'package:gameover/phlcommons.dart';
+import 'package:gameover/selectgamers.dart';
 import 'package:gameover/selectphotos.dart';
 import 'package:http/http.dart' as http;
-import 'package:clipboard/clipboard.dart';
+
+class ButtonWidget extends StatelessWidget {
+  final String text;
+  final Color color;
+  final Color backgroundColor;
+  final VoidCallback onClicked;
+
+  const ButtonWidget(
+      {Key? key,
+      required this.text,
+      required this.onClicked,
+      this.color = Colors.white,
+      this.backgroundColor = Colors.black})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) => ElevatedButton(
+      style: ElevatedButton.styleFrom(
+          primary: backgroundColor,
+          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16)),
+      onPressed: onClicked,
+      child: Text(
+        text,
+        style: TextStyle(fontSize: 20, color: color),
+      ));
+}
+
 class GameManager extends StatefulWidget {
   const GameManager({Key? key}) : super(key: key);
 
   @override
   State<GameManager> createState() => _GameManagerState();
 }
-class _GameManagerState extends State<GameManager> {
-  Color  colorOK =Colors.green;
-  Color  colorKO=Colors.red;
-  bool myBool = false;
 
+class _GameManagerState extends State<GameManager> {
+  GameCommons myPerso = GameCommons("xxxx", 0, 0);
+  bool myBool = false;
   bool isGameActif = false; // Pas de Game Acfig
   bool isPublic = true;
   bool isGameValidated = false;
@@ -31,31 +57,45 @@ class _GameManagerState extends State<GameManager> {
   TextEditingController gameNbGamersController = TextEditingController();
   String thatGameName = ""; //<TODO>
   int thatGameCode = 0;
-  String thatGM = PhlCommons.listThatGM[0].gmpseudo;
-  int thatGmid = PhlCommons.listThatGM[0].gmid;
-  double nbGamers = 2;
+  String thatGM = "xx";
+  int thatGmid = 0;
+  double nbGamers = 1;
   double nbPhotos = 1;
   double nbSecMeme = 20;
   double nbSecVote = 30;
-  String dispNbFotosGame = "";
+  String dispNbFotosGame = "0";
   String thatGameCodeString = "";
-  //
   bool timeOut = false;
-
-  bool getGmGamesState  = false;
+  bool getGmGamesState = false;
   int getGmGamesError = -1;
-
-  bool createGameState  = false;
+  bool createGameState = false;
   int createGameError = -1;
-  //
   Duration countDownGameDuration = const Duration(seconds: 40);
   Duration durationGame = const Duration();
   Timer? timerGame;
   bool countDownGame = true;
-//
+
+  void addTime() {
+    final addSeconds = countDownGame ? -1 : 1;
+    setState(() {
+      final seconds = durationGame.inSeconds + addSeconds;
+      if (seconds < 0) {
+        timerGame?.cancel();
+        timeOut = true;
+      } else {
+        durationGame = Duration(seconds: seconds);
+      }
+    });
+  }
+
+  //
 
   @override
   Widget build(BuildContext context) {
+    // Attention mal  placé
+    myPerso = ModalRoute.of(context)!.settings.arguments as GameCommons;
+    gameNameController.text = thatGameCodeString;
+
     return MaterialApp(
         debugShowCheckedModeBanner: false,
         title: thatGM,
@@ -78,14 +118,14 @@ class _GameManagerState extends State<GameManager> {
                   ElevatedButton(
                     onPressed: () => {null},
                     style: ElevatedButton.styleFrom(
-                        primary: Colors.green,
+                        primary: Colors.blue,
                         padding: const EdgeInsets.symmetric(
                             horizontal: 25, vertical: 10),
                         textStyle: const TextStyle(
                             fontSize: 10,
-                            backgroundColor: Colors.green,
+                            backgroundColor: Colors.blue,
                             fontWeight: FontWeight.bold)),
-                    child: Text('' + thatGM + " ",
+                    child: Text('' + myPerso.myPseudo + " ",
                         style: const TextStyle(
                           color: Colors.black,
                           fontSize: 18,
@@ -98,20 +138,34 @@ class _GameManagerState extends State<GameManager> {
                       Tooltip(
                         message: 'Copy',
                         child: ElevatedButton(
-                            onPressed: () => { copyClipBoard(thatGameCodeString)},
-
+                            onPressed: () =>
+                                {copyClipBoard(thatGameCodeString)},
                             style: ElevatedButton.styleFrom(
-                                primary: Colors.red,
+                                primary: Colors.blue,
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 8, vertical: 5),
                                 textStyle: const TextStyle(
                                     fontSize: 14,
-                                    backgroundColor: Colors.red,
+                                    backgroundColor: Colors.blue,
                                     fontWeight: FontWeight.bold)),
-                            //child: Text(thatGameName +'' + thatGameCodeString )),
-                            child: Text(  thatGameCodeString )
-                        ),
+                            child: Text(thatGameCodeString,
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.normal,
+                                  fontStyle: FontStyle.normal,
+                                ))),
                       ),
+                      Visibility(
+                        visible: isGameValidated,
+                        child: Text(" is Running..",
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 18,
+                              fontWeight: FontWeight.normal,
+                              fontStyle: FontStyle.normal,
+                            )),
+                      )
                     ],
                   ),
                 ],
@@ -119,223 +173,290 @@ class _GameManagerState extends State<GameManager> {
             ),
           ]),
           //  ECRAN PRINCIP
-          body: Column(
-            children: [
-              SafeArea(
-                child: Column(children: <Widget>[
-                  Align(
-                    alignment: Alignment.topLeft,
-                    child: SizedBox(
-                      width: 180,
-                      height: 80,
-                      child: Padding(
-                        padding: const EdgeInsets.all(15.0),
-                        child: TextField(
-                          controller: gameNameController,
-                          decoration: InputDecoration(
-                            border: const OutlineInputBorder(),
-                            labelText: "Game",
-                            fillColor: Colors.blue,
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(
-                                  color: Colors.white, width: 2.0),
-                              borderRadius: BorderRadius.circular(25.0),
-                            ),
-                          ),
-                          onChanged: (text) {
-                            setState(() {
-                              if (gameNameController.text.isNotEmpty) {
-                                thatGameName =
-                                    gameNameController.text.toUpperCase();
-                              }
-                              if (thatGameName.length > 8) {
-                                thatGameName = thatGameName.substring(0, 8);
-                              }
-                            });
-                          },
-                          onSubmitted: (text) {
-                            setState(() {
-                              gameNameController.text = thatGameName;
-                            });
-                          },
-                        ),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(5.0),
-                    child: Row(
-                      children: [
-                        const Text('Public'),
-                        Checkbox(
-                          value: isPublic,
-                          onChanged: (value) {
-                            setState(() {
-                              isPublic = !isPublic;
-                            });
-                          },
-                        ),
-                        const Text('Private'),
-                        Checkbox(
-                          value: !isPublic,
-                          onChanged: (value) {
-                            setState(() {
-                              isPublic = !isPublic;
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    // Slider N°1 Gamers
-                    padding: const EdgeInsets.all(5.0),
-                    child: Row(
-                      children: [
-                        Text(nbGamers.toString() + " Gamers"),
-                        Slider(
-                          label: 'Gamers ',
-                          activeColor: Colors.orange,
-                          divisions: 20,
-                          min: 1,
-                          max: 20,
-                          value: nbGamers,
-                          onChanged: (double newValue) {
-                            setState(() {
-                              newValue = newValue.round() as double;
-                              if (newValue != nbGamers) nbGamers = newValue;
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    // Slider N°2 Photos
-                    padding: const EdgeInsets.all(5.0),
-                    child: Row(
-                      children: [
-                        Text(nbPhotos.toString() + " Photos"),
-                        Slider(
-                          label: 'Photos ',
-                          activeColor: Colors.orange,
-                          divisions: 10,
-                          min: 1,
-                          max: 10,
-                          value: nbPhotos,
-                          onChanged: (double newValue) {
-                            setState(() {
-                              newValue = newValue.round() as double;
-                              if (newValue != nbPhotos) nbPhotos = newValue;
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    // Slider N° 3   Sec/Mem
-                    padding: const EdgeInsets.all(5.0),
-                    child: Row(
-                      children: [
-                        Text(nbSecMeme.toString() + " Sec/Mem"),
-                        Slider(
-                          label: 'Sec/ Meme ',
-                          activeColor: Colors.orange,
-                          divisions: 20,
-                          min: 20,
-                          max: 420,
-                          value: nbSecMeme,
-                          onChanged: (double newValue) {
-                            setState(() {
-                              //     dispNbFotosGame = PhlCommons.nbFotosGame.toString(); // <TODO>
-                              newValue = newValue.round() as double;
-                              if (newValue != nbSecMeme) nbSecMeme = newValue;
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    // Slider N° 4   Sec/ Vote
-                    padding: const EdgeInsets.all(10.0),
-                    child: Row(
-                      children: [
-                        Text(nbSecVote.toString() + " Sec /Vote"),
-                        Slider(
-                          label: 'Votes ',
-                          activeColor: Colors.orange,
-                          divisions: 20,
-                          min: 10,
-                          max: 110,
-                          value: nbSecVote,
-                          onChanged: (double newValue) {
-                            setState(() {
-                              newValue = newValue.round() as double;
-                              if (newValue != nbSecVote) nbSecVote = newValue;
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                  Row(
-                    children: [
-                      ElevatedButton(
-                          onPressed: () => {overSelectPhotosPhl()},
-                          style: ElevatedButton.styleFrom(
-                              primary: Colors.red,
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 15, vertical: 10),
-                              textStyle: const TextStyle(
-                                  fontSize: 10,
-                                  backgroundColor: Colors.red,
-                                  fontWeight: FontWeight.bold)),
-                          child: const Text('PHOTOS')),
-                      Visibility(
-                        visible: nbPhotos == PhlCommons.nbFotosGame &&
-                            nbPhotos > 0 &&
-                            thatGameName.length > 2 &&
-                            !isGameValidated,
-                        child: ElevatedButton(
-                          onPressed: () => {newGame()},
-                          style: ElevatedButton.styleFrom(
-                              primary: Colors.green,
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 25, vertical: 10),
-                              textStyle: const TextStyle(
-                                  fontSize: 10,
-                                  backgroundColor: Colors.green,
-                                  fontWeight: FontWeight.bold)),
-                          child: const Text('Valider',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 18,
-                                fontWeight: FontWeight.normal,
-                                fontStyle: FontStyle.normal,
-                              )),
-                        ),
-                        //createGameState
+          body: Container(
 
-
-                      ),
-                      Text(createGameState.toString(),
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontSize: 18,
-                            fontWeight: FontWeight.normal,
-                            fontStyle: FontStyle.normal,
-                          )),
-                    ],
-                  ),
-                ]),
+            constraints:
+            BoxConstraints(minHeight: MediaQuery.of(context).size.height
+              //set minimum height equal to 100% of VH
+            ),
+            width: MediaQuery.of(context).size.width,
+            //make width of outer wrapper to 100%
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topRight,
+                end: Alignment.bottomLeft,
+                colors: [
+                  Colors.orange,
+                  Colors.deepOrangeAccent,
+                  Colors.red,
+                  Colors.redAccent,
+                ],
               ),
-              // Container(child: dispMyGames())
-            ],
+            ),
+            //show linear gradient background of page
+
+            padding: const EdgeInsets.all(20),
+
+            child: Column(
+
+              children: [
+                SafeArea(
+                  child: Column(children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.all(5.0),
+                      child: Row(
+                        children: [
+                          const Text('Public'),
+                          Checkbox(
+                            value: isPublic,
+                            onChanged: (value) {
+                              setState(() {
+                                isPublic = !isPublic;
+                              });
+                            },
+                          ),
+                          const Text('Private'),
+                          Checkbox(
+                            value: !isPublic,
+                            onChanged: (value) {
+                              setState(() {
+                                isPublic = !isPublic;
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                    Padding(
+
+                      padding: const EdgeInsets.all(5.0),
+                      child: Row(
+                        children: [
+                          Text(dispNbFotosGame +
+                              '/' +
+                              nbPhotos.toString() +
+                              " Photos"),
+                          Slider(
+                            label: 'Photos ',
+                            activeColor: Colors.blueGrey,
+                            divisions: 10,
+                            min: 1,
+                            max: 10,
+                            value: nbPhotos,
+                            onChanged: (double newValue) {
+                              setState(() {
+                                newValue = newValue.round() as double;
+                                if (newValue != nbPhotos) nbPhotos = newValue;
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      // Slider N°1 Gamers
+                      padding: const EdgeInsets.all(5.0),
+                      child: Row(
+                        children: [
+                          Text(PhlCommons.nbGamersGame.toString() +
+                              '/' +
+                              nbGamers.toString() +
+                              " Gamers"),
+                          Slider(
+                            label: 'Gamers ',
+                            activeColor: Colors.orange,
+                            divisions: 20,
+                            min: 1,
+                            max: 20,
+                            value: nbGamers,
+                            onChanged: (double newValue) {
+                              setState(() {
+                                newValue = newValue.round() as double;
+                                if (newValue != nbGamers) nbGamers = newValue;
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      // Slider N° 3   Sec/Mem
+                      padding: const EdgeInsets.all(5.0),
+                      child: Row(
+                        children: [
+                          Text(nbSecMeme.toString() + " Sec/Mem"),
+                          Slider(
+                            label: 'Sec/ Meme ',
+                            activeColor: Colors.orange,
+                            divisions: 20,
+                            min: 20,
+                            max: 420,
+                            value: nbSecMeme,
+                            onChanged: (double newValue) {
+                              setState(() {
+                                //     dispNbFotosGame = PhlCommons.nbFotosGame.toString(); // <TODO>
+                                newValue = newValue.round() as double;
+                                if (newValue != nbSecMeme) nbSecMeme = newValue;
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Row(
+                        children: [
+                          Text(nbSecVote.toString() + " Sec /Vote"),
+                          Slider(
+                            label: 'Votes ',
+                            activeColor: Colors.orange,
+                            divisions: 20,
+                            min: 10,
+                            max: 110,
+                            value: nbSecVote,
+                            onChanged: (double newValue) {
+                              setState(() {
+                                newValue = newValue.round() as double;
+                                if (newValue != nbSecVote) nbSecVote = newValue;
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                    Visibility(
+                      visible: !isGameValidated,
+                      child: Row(
+                        children: [
+                          ElevatedButton(
+                              onPressed: () => {overSelectPhotosPhl()},
+                              style: ElevatedButton.styleFrom(
+                                  primary: Colors.red,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 15, vertical: 10),
+                                  textStyle: const TextStyle(
+                                      fontSize: 15,
+                                      backgroundColor: Colors.blue,
+                                      fontWeight: FontWeight.bold)),
+                              child: const Text('Photos')),
+                          ElevatedButton(
+                              onPressed: () => {overSelectGamersPhl()},
+                              style: ElevatedButton.styleFrom(
+                                  primary: Colors.red,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 15, vertical: 10),
+                                  textStyle: const TextStyle(
+                                      fontSize: 15,
+                                      backgroundColor: Colors.blue,
+                                      fontWeight: FontWeight.bold)),
+                              child: const Text('Gamers')),
+                          Visibility(
+                            visible: isValidatedOk(),
+                            child: ElevatedButton(
+                              onPressed: () => {newGame()},
+                              style: ElevatedButton.styleFrom(
+                                  primary: Colors.green,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 25, vertical: 10),
+                                  textStyle: const TextStyle(
+                                      fontSize: 10,
+                                      backgroundColor: Colors.green,
+                                      fontWeight: FontWeight.bold)),
+                              child: const Text('Valider',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.normal,
+                                    fontStyle: FontStyle.normal,
+                                  )),
+                            ),
+                            //createGameState
+                          ),
+                        ],
+                      ),
+                    ),
+                  ]),
+                ),
+              ],
+            ),
           ),
         ));
   }
+
+  Widget buildButtons() {
+    final isRunning = timerGame == null ? false : timerGame!.isActive;
+    final isCompleted = durationGame.inSeconds == 0;
+    return isRunning || isCompleted
+        ? Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ButtonWidget(
+                  text: 'STOP',
+                  onClicked: () {
+                    if (isRunning) {
+                      stopTimer(resets: false);
+                    }
+                  }),
+              const SizedBox(
+                width: 12,
+              ),
+              ButtonWidget(text: "CANCEL", onClicked: stopTimer),
+            ],
+          )
+        : ButtonWidget(
+            text: "Start Timer!",
+            color: Colors.black,
+            backgroundColor: Colors.white,
+            onClicked: () {
+              startTimer();
+            });
+  }
+
+  Widget buildTime() {
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+
+    final minutes = twoDigits(durationGame.inMinutes.remainder(60));
+    final seconds = twoDigits(durationGame.inSeconds.remainder(60));
+    return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+      /* buildTimeCard(time: hours, header:''),
+          SizedBox(width: 8,),*/
+      buildTimeCard(time: minutes, header: ''),
+      const SizedBox(
+        width: 8,
+      ),
+      buildTimeCard(time: seconds, header: ''),
+    ]);
+  }
+
+  Widget buildTimeCard({required String time, required String header}) =>
+      Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+                color: Colors.white, borderRadius: BorderRadius.circular(20)),
+            child: Text(
+              time,
+              style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                  fontSize: 20),
+            ),
+          ),
+          const SizedBox(
+            height: 24,
+          ),
+          Text(header, style: const TextStyle(color: Colors.black45)),
+        ],
+      );
+
+  copyClipBoard(String copire) {
+    //  Clipboard.setData(ClipboardData(text: "your text"));
+    FlutterClipboard.copy(copire).then((value) => print('copied'));
+  }
+
   Expanded dispMyGames() {
     //if (!feuVert) return (const Expanded(child: Text("Je Joue ........")));
     // Lire ous les Games  de ce gamers
@@ -362,57 +483,71 @@ class _GameManagerState extends State<GameManager> {
         });
     return (Expanded(child: listView));
   }
-  Future getGmGames() async {
-    Uri url = Uri.parse(pathPHP+"getGMGAMES.php");
-    var data = {
-      "GMID": thatGmid.toString(),
-    };
-    getGmGamesState  = false;
-    getGmGamesError = -1;
 
+  genCodeGame() {
+    var rng = Random();
+    var rand1 = rng.nextInt(8) + 1;
+    var rand2 = rng.nextInt(1000000);
+    setState(() {
+      thatGameCode = rand1 * 10000000 + rand2;
+      thatGameCodeString = thatGameCode.toString();
+
+      thatGameName = thatGameCode.toString();
+    });
+  }
+
+  Future getGmGames() async {
+    Uri url = Uri.parse(pathPHP + "getGMGAMES.php");
+    var data = {
+      "GMID": "2",
+    };
+    getGmGamesState = false;
+    getGmGamesError = -1;
     http.Response response = await http.post(url, body: data);
 
     if (response.body.toString() == 'ERR_1001') {
       nbGmGames = 0;
-      getGmGamesError=1001; //Not Found
+      getGmGamesError = 1001; //Not Found
 
     }
 
-    if (response.statusCode == 200 && (getGmGamesError!=1001 )) {
+    if (response.statusCode == 200 && (getGmGamesError != 1001)) {
       var datamysql = jsonDecode(response.body) as List;
       getGmGamesError = 0;
       setState(() {
-        getGmGamesError=0;
+        getGmGamesError = 0;
 
         listGmGames = datamysql.map((xJson) => Games.fromJson(xJson)).toList();
 
-
-        getGmGamesState  = true;
+        getGmGamesState = true;
       });
     } else {}
   }
+
   @override
   void initState() {
     super.initState();
     setState(() {
-      thatGM = PhlCommons.listThatGM[0].gmpseudo;
-      thatGmid = PhlCommons.listThatGM[0].gmid;
+      genCodeGame();
+      PhlCommons.thisGameCode = thatGameCode;
+      /*
       getGmGames();
       dispNbFotosGame = PhlCommons.nbFotosGame.toString();
       genCodeGame();
       PhlCommons.thisGameCode=thatGameCode;
-
+*/
     });
   }
 
-  copyClipBoard(String copire){
+  bool isValidatedOk() {
+    //PhlCommons.nbFotosGame
+    bool _isOK = false;
+    _isOK = (nbPhotos == PhlCommons.nbFotosGame) && (nbGamers==PhlCommons.nbGamersGame) && !isGameValidated;
 
-  //  Clipboard.setData(ClipboardData(text: "your text"));
-    FlutterClipboard.copy(copire).then(( value ) =>
-        print('copied'));
+    return (_isOK);
   }
+
   majCommonGame(
-      //  Mettre en Common Le Game Actif
       int _gameCode,
       int _gameMode,
       int _gameStatus,
@@ -442,6 +577,7 @@ class _GameManagerState extends State<GameManager> {
     PhlCommons.gameActif.gametimer = _gameTimer;
     PhlCommons.gameActif.gameopen = _gameOpen;
   }
+
   Future newGame() async {
     int _gameStatus = 1; // PHOTOCLOSED
     int _gameNbGamersActifs = 0;
@@ -450,11 +586,8 @@ class _GameManagerState extends State<GameManager> {
     int _gameTimer = 0;
     int _gameOpen = 0;
     if (isPublic) _thatMode = 1;
-
     isGameValidated = true; // OK on a preque valid
-    // Mise en Common
     String _today = DateTime.now().toString();
-
 
     majCommonGame(
       thatGameCode,
@@ -462,7 +595,7 @@ class _GameManagerState extends State<GameManager> {
       _gameStatus,
       thatGameName,
       _today,
-      thatGmid,
+      myPerso.myUid,
       nbGamers.toInt(),
       nbPhotos.toInt(),
       _gameNbGamersActifs,
@@ -472,17 +605,17 @@ class _GameManagerState extends State<GameManager> {
       _gameTimer,
       _gameOpen,
     );
-    Uri url = Uri.parse(pathPHP+"createGAME.php");
-    createGameState  = false;
+    Uri url = Uri.parse(pathPHP + "createGAME.php");
+    createGameState = false;
     createGameError = -1;
-// Mise au Propre
+
     var data = {
       "GAMECODE": PhlCommons.gameActif.gamecode.toString(),
       "GAMEMODE": PhlCommons.gameActif.gamemode.toString(),
       "GAMESTATUS": PhlCommons.gameActif.gamestatus.toString(),
       "GAMENAME": PhlCommons.gameActif.gamename,
       "GAMEDATE": PhlCommons.gameActif.gamedate,
-      "GMID": PhlCommons.gameActif.gmid.toString(),
+      "GMID": myPerso.myUid.toString(), // Garde UID de celui qui se connecte Pas de Doublons
       "GAMENBGAMERS": PhlCommons.gameActif.gamenbgamers.toString(),
       "GAMENBPHOTOS": PhlCommons.gameActif.gamenbphotos.toString(),
       "GAMENBGAMERSACTIFS": PhlCommons.gameActif.gamenbgamersactifs.toString(),
@@ -495,43 +628,52 @@ class _GameManagerState extends State<GameManager> {
     var response = await http.post(url, body: data);
 
     if (response.body.toString() == 'ERR_1001') {
-    nbGmGames = 0;
-    createGameState  = false;
-   createGameError = 1001;
-
-
+      nbGmGames = 0;
+      createGameState = false;
+      createGameError = 1001;
     }
 
-    if (response.statusCode == 200 && (createGameError!=1001 )) {
-    var datamysql = jsonDecode(response.body) as List;
-    createGameError = 0;
-    setState(() {
-    createGameError=0;
-    listGmGames = datamysql.map((xJson) => Games.fromJson(xJson)).toList();
-    createGameState  = true;
-    });
+    if (response.statusCode == 200 && (createGameError != 1001)) {
+      var datamysql = jsonDecode(response.body) as List;
+      createGameError = 0;
+      setState(() {
+        createGameError = 0;
+        listGmGames = datamysql.map((xJson) => Games.fromJson(xJson)).toList();
+        createGameState = true;
+      });
     } else {}
-  //  getGmGames();
+    //  getGmGames();
   }
-  Future overSelectPhotosPhl() async {
+  Future overSelectGamersPhl() async {
     await (Navigator.push(
-        context, MaterialPageRoute(builder: (context) => SelectPhotosPhl())));
+      context,
+      MaterialPageRoute(
+        builder: (context) => SelectGamers(),
+        settings: RouteSettings(
+          arguments: myPerso,
+        ),
+      ),
+    ));
     setState(() {
       dispNbFotosGame = PhlCommons.nbFotosGame.toString(); // <TODO>
     });
   }
-  genCodeGame()
-  {
-    var rng = Random();
-    var rand1 = rng.nextInt(8) + 1;
-    var rand2 = rng.nextInt(1000000);
-    setState(() {
-      thatGameCode = rand1 * 10000000 + rand2;
-      thatGameCodeString = thatGameCode.toString();
-    });
 
+  Future overSelectPhotosPhl() async {
+    await (Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SelectPhotosPhl(),
+        settings: RouteSettings(
+          arguments: myPerso,
+        ),
+      ),
+    ));
+    setState(() {
+      dispNbFotosGame = PhlCommons.nbFotosGame.toString(); // <TODO>
+    });
   }
-  //   CHRONO
+
   void reset() {
     if (countDownGame) {
       setState(() => durationGame = countDownGameDuration);
@@ -539,115 +681,15 @@ class _GameManagerState extends State<GameManager> {
       setState(() => durationGame = const Duration());
     }
   }
+
   void startTimer() {
     timerGame = Timer.periodic(const Duration(seconds: 1), (_) => addTime());
   }
-  void addTime() {
-    final addSeconds = countDownGame ? -1 : 1;
-    setState(() {
-      final seconds = durationGame.inSeconds + addSeconds;
-      if (seconds < 0) {
-        timerGame?.cancel();
-        timeOut = true;
-      } else {
-        durationGame = Duration(seconds: seconds);
-      }
-    });
-  }
+
   void stopTimer({bool resets = true}) {
     if (resets) {
       reset();
     }
     setState(() => timerGame?.cancel());
   }
-  Widget buildTime() {
-    String twoDigits(int n) => n.toString().padLeft(2, '0');
-
-    final minutes = twoDigits(durationGame.inMinutes.remainder(60));
-    final seconds = twoDigits(durationGame.inSeconds.remainder(60));
-    return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-      /* buildTimeCard(time: hours, header:''),
-          SizedBox(width: 8,),*/
-      buildTimeCard(time: minutes, header: ''),
-      const SizedBox(
-        width: 8,
-      ),
-      buildTimeCard(time: seconds, header: ''),
-    ]);
-  }
-  Widget buildTimeCard({required String time, required String header}) =>
-      Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-                color: Colors.white, borderRadius: BorderRadius.circular(20)),
-            child: Text(
-              time,
-              style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                  fontSize: 20),
-            ),
-          ),
-          const SizedBox(
-            height: 24,
-          ),
-          Text(header, style: const TextStyle(color: Colors.black45)),
-        ],
-      );
-  Widget buildButtons() {
-    final isRunning = timerGame == null ? false : timerGame!.isActive;
-    final isCompleted = durationGame.inSeconds == 0;
-    return isRunning || isCompleted
-        ? Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        ButtonWidget(
-            text: 'STOP',
-            onClicked: () {
-              if (isRunning) {
-                stopTimer(resets: false);
-              }
-            }),
-        const SizedBox(
-          width: 12,
-        ),
-        ButtonWidget(text: "CANCEL", onClicked: stopTimer),
-      ],
-    )
-        : ButtonWidget(
-        text: "Start Timer!",
-        color: Colors.black,
-        backgroundColor: Colors.white,
-        onClicked: () {
-          startTimer();
-        });
-  }
-}
-class ButtonWidget extends StatelessWidget {
-  final String text;
-  final Color color;
-  final Color backgroundColor;
-  final VoidCallback onClicked;
-
-  const ButtonWidget(
-      {Key? key,
-        required this.text,
-        required this.onClicked,
-        this.color = Colors.white,
-        this.backgroundColor = Colors.black})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) => ElevatedButton(
-      style: ElevatedButton.styleFrom(
-          primary: backgroundColor,
-          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16)),
-      onPressed: onClicked,
-      child: Text(
-        text,
-        style: TextStyle(fontSize: 20, color: color),
-      ));
 }
