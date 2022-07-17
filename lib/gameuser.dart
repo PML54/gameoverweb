@@ -46,10 +46,11 @@ class _GameUserState extends State<GameUser> {
   bool changeStatusGameUserState = false;
 
   //  Chrono
-  Duration countdownDuration = const Duration(seconds: 40);
+  Duration countdownDuration = const Duration(seconds: 59);
   Duration duration = const Duration();
   Timer? timer;
   bool countDown = true;
+
 
   void addTime() {
     final addSeconds = countDown ? -1 : 1;
@@ -129,16 +130,31 @@ class _GameUserState extends State<GameUser> {
   }
 
   buildTime() {
+
     totalSeconds = duration.inMinutes * 60 + duration.inSeconds;
+
+    if (totalSeconds <= 1) {
+      createMeme();
+      stopTimer();
+      changeStatusGameUser(4);//MEME CLOSED
+      Navigator.pop(context);
+    }
   }
 
   Future changeStatusGameUser(int _status) async {
+
+    // STATUS ONLINE/OFFINE =BIT 1 on
+    // 2 MEMING
+    // 4 MEMECLOSED
+    // 8  VOTING
+    // 16 VOTECLOSED
     Uri url = Uri.parse(pathPHP + "changeStatusGameUser.php");
     changeStatusGameUserState = false;
     var data = {
       "GAMECODE": PhlCommons.thisGameCode.toString(),
       "UID": PhlCommons.thatUid.toString(),
-      "GUSTATUS": _status.toString(),
+      // +1 CAr  si le GameUSer Vote cest donc quil est en ligne
+      "GUSTATUS": (_status +1) .toString(),
     };
     await http.post(url, body: data);
     changeStatusGameUserState = true;
@@ -182,6 +198,7 @@ class _GameUserState extends State<GameUser> {
         myGuGame = datamysql.map((xJson) => Games.fromJson(xJson)).toList();
         getGamebyCodeState = true;
         getGamebyCodeError = 0;
+        getGamePhotoSelect(); // Il faut le GameCore
       });
     } else {}
   }
@@ -293,7 +310,7 @@ class _GameUserState extends State<GameUser> {
         //
         timerMemeGame = myGuGame[0].gametimememe;
         countdownDuration = Duration(seconds: timerMemeGame);
-        //  Duration duration = Duration();
+
         reset();
         countDown = true;
         startTimer();
@@ -311,23 +328,20 @@ class _GameUserState extends State<GameUser> {
                 children: [
                   Expanded(
                     child: Container(
-                        margin: const EdgeInsets.all(2.0),
-                        padding: const EdgeInsets.all(2.0),
+                      /*margin: const EdgeInsets.all(2.0),
+                        padding: const EdgeInsets.all(2.0),0
                         decoration: BoxDecoration(
                             color: listPhotoBase[index].extraColor,
-                            border: Border.all()),
-                        child: Column(
-                          children: [
-                            Image.network(
-                              "upload/" +
-                                  listPhotoBase[index].photofilename +
-                                  "." +
-                                  listPhotoBase[index].photofiletype,
-                              width: (listPhotoBase[index].extraWidth),
-                              height: (listPhotoBase[index].extraHeight),
-                            ),
-                          ],
-                        )),
+                            border: Border.all()),*/
+                      child: Image.network(
+                        "upload/" +
+                            listPhotoBase[index].photofilename +
+                            "." +
+                            listPhotoBase[index].photofiletype,
+                        /*width: (listPhotoBase[index].extraWidth),
+                              height: (listPhotoBase[index].extraHeight),*/
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -366,9 +380,9 @@ class _GameUserState extends State<GameUser> {
     super.initState();
     reset();
     getGamebyUidState = true;
-    //getGamebyUid();
-    getGamePhotoSelect(); // Il faut le GameCore
     getGamebyCode(); // H-eu
+
+    changeStatusGameUser(2);//MEMING 
   }
 
   void reset() {
@@ -381,6 +395,8 @@ class _GameUserState extends State<GameUser> {
 
   void startTimer() {
     timer = Timer.periodic(const Duration(seconds: 1), (_) => addTime());
+
+
   }
 
   void stopTimer({bool resets = true}) {

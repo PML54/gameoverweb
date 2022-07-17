@@ -38,7 +38,6 @@ class CheckVote {
 }
 
 class CheckVotePlus {
-  //
   // SELECT MEMOLIKEID ,MLVPOINTS, COUNT(MLVPOINTS) AS 'CUMU'
   // from MEMOLIKEVOTE GROUP BY MEMOLIKEID,MLVPOINTS
   // order by MEMOLIKEID,MLVPOINTS;
@@ -107,17 +106,21 @@ class GameByUser {
   int uid = 0;
   int gamecode = 0;
   int status = 0;
+  int gmid=0;
   bool isSelected = false;
   Color extraColor = Colors.grey;
+
   GameByUser({
     required this.uid,
     required this.gamecode,
+    required this.gmid,
   });
 
   factory GameByUser.fromJson(Map<String, dynamic> json) {
     return GameByUser(
       uid: int.parse(json['UID']),
       gamecode: int.parse(json['GAMECODE']),
+      gmid:int.parse(json['GMID']),
     );
   }
 }
@@ -130,6 +133,7 @@ class GameLike {
   String photofilename = "FFFF";
   String photofiletype = "TTT";
   String memetext = "FFFF";
+  int mynote = 0;
 
   GameLike(
       {required this.memeid,
@@ -267,7 +271,6 @@ class GameUsers {
   String gudate = "05-05-2022";
   String gupseudo = "FFFF";
 
-
   GameUsers({
     required this.guid,
     required this.gamecode,
@@ -275,7 +278,6 @@ class GameUsers {
     required this.guipv4,
     required this.gudate,
     required this.gupseudo,
-
   });
 
   factory GameUsers.fromJson(Map<String, dynamic> json) {
@@ -289,6 +291,54 @@ class GameUsers {
     );
   }
 }
+//
+
+class GameVotes {
+  int uid = 0;
+  int memeid = 0;
+  int gamecode = 0;
+  int gvpoints = 0;
+  String gvlast = "05-05-2022";
+
+  GameVotes({
+    required this.uid,
+    required this.memeid,
+    required this.gamecode,
+    required this.gvpoints,
+    required this.gvlast,
+  });
+
+  factory GameVotes.fromJson(Map<String, dynamic> json) {
+    return GameVotes(
+      uid: int.parse(json['UID']),
+      memeid: int.parse(json['MEMEID']),
+      gamecode: int.parse(json['GAMECODE']),
+      gvpoints: int.parse(json['GVPOINTS']),
+      gvlast: json['GVLAST'] as String,
+    );
+  }
+}
+
+class GameVotesResult {
+  int memeid = 0;
+  int gamecode = 0;
+  int  sumg = 0;
+
+  GameVotesResult({
+    required this.memeid,
+    required this.gamecode,
+    required this.sumg,
+  });
+
+  factory GameVotesResult.fromJson(Map<String, dynamic> json) {
+    return GameVotesResult(
+      memeid: int.parse(json['MEMEID']),
+      gamecode: int.parse(json['GAMECODE']),
+      sumg: int.parse(json['SUMG']),
+    );
+  }
+}
+
 
 //------------>  Memes N°5
 class Memes {
