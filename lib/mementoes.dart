@@ -82,8 +82,18 @@ class _MementoState extends State<Memento> {
       "MEMOCAT": myUid.toString(),
       "MEMOSTOCK": memeLegende,
     };
+
+    print (" myUid.toString()," + myUid.toString());
+    print ("memeLegende"+memeLegende);
     if (memeLegende.length > 2 && memeLegende.length < 250) {
-   await http.post(url, body: data);
+      http.Response response =  await http.post(url, body: data);
+
+   if (response.body.toString() == 'ERROR_OK') {
+     print ("OK from createMEMESOLO");
+  } else {
+     print (" KO rom createMEMESOLO");
+   }
+
     }
   }
 

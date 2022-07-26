@@ -23,8 +23,8 @@ class _RandoMemeState extends State<RandoMeme> {
   TextEditingController legendeController = TextEditingController();
   int totalSeconds = 100;
   bool timeOut = false;
-  bool boolCategory = false;
-  int getPhotoCatError = -1;
+bool boolOptions=true;
+ bool boolCategory = false;  int getPhotoCatError = -1;
   int nbPhotoCat = 0;
   int getPhotoBaseError = -1;
   List<int> photoidSelected = []; // retenues avec les Catégotire
@@ -136,13 +136,14 @@ class _RandoMemeState extends State<RandoMeme> {
             child: getViewPhotoCat(),
           ),
           getget(),
+          dispParams(),
         ]),
       ),
       bottomNavigationBar: Row(
         children: [
           IconButton(
               icon: const Icon(Icons.insert_photo),
-              iconSize: 35,
+              iconSize: 30,
               color: Colors.greenAccent,
               tooltip: 'Categories',
               onPressed: () {
@@ -152,7 +153,7 @@ class _RandoMemeState extends State<RandoMeme> {
               }),
           IconButton(
               icon: const Icon(Icons.message_outlined),
-              iconSize: 35,
+              iconSize: 30,
               color: Colors.blue,
               tooltip: 'Caption',
               onPressed: () {
@@ -160,17 +161,19 @@ class _RandoMemeState extends State<RandoMeme> {
                   boolTexfield = !boolTexfield;
                 });
                 //stopTimer();
-              }),
+              }
+
+
+              ),
           IconButton(
               icon: const Icon(Icons.gavel),
-              iconSize: 50,
+              iconSize: 30,
               color: Colors.red,
               tooltip: 'Photo Random',
               onPressed: () {
                 setState(() {
                   int random = Random().nextInt(nbPhotoRandom); //Suppe 1
                   int randomMeme = Random().nextInt(listMemoto.length);
-
                   photoIdRandom = photoidSelected[random];
                   boolCategory = false;
                   if (!lockPhotoState) {
@@ -186,10 +189,12 @@ class _RandoMemeState extends State<RandoMeme> {
                   //legendeController.text =""; // Test
                   savePRL(); // Ajout pour toutes
                 });
-              }),
+              }
+
+              ),
           IconButton(
               icon: const Icon(Icons.arrow_back),
-              iconSize: 35,
+              iconSize: 30,
               color: Colors.blue,
               tooltip: 'Prev',
               onPressed: () {
@@ -199,13 +204,27 @@ class _RandoMemeState extends State<RandoMeme> {
               }),
           IconButton(
               icon: const Icon(Icons.arrow_forward),
-              iconSize: 35,
+              iconSize: 30,
               color: Colors.blue,
               tooltip: 'Next',
               onPressed: () {
                 nextPRL();
 
               }),
+          IconButton(
+              icon: const Icon(Icons.restaurant_menu),
+              iconSize: 30,
+              color: Colors.purpleAccent,
+              tooltip: 'Options Game',
+              onPressed: () {
+                setState(() {
+                  boolOptions = !boolOptions;
+                });
+
+              }
+
+              ),
+
         ],
       ),
     ));
@@ -314,6 +333,150 @@ class _RandoMemeState extends State<RandoMeme> {
     )));
   }
 
+
+  dispParams() {
+
+    return
+      Expanded(
+        child: Visibility(
+          visible: boolOptions,
+          child: Container(
+            child: (Column(
+              children: [
+                Row(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            primary: Colors.purpleAccent,
+                            padding:
+                            const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                            textStyle: const TextStyle(
+                                fontSize: 20,
+                                backgroundColor: Colors.purpleAccent,
+                                fontWeight: FontWeight.bold)),
+                        child: Text('    Random Meme        ' ),
+                          onPressed: () {
+                            setState(() {
+                              int random = Random().nextInt(nbPhotoRandom); //Suppe 1
+                              int randomMeme = Random().nextInt(listMemoto.length);
+
+                              photoIdRandom = photoidSelected[random];
+                              boolCategory = false;
+                              if (!lockPhotoState) {
+                                cestCeluiLa = getIndexFromPhotoId(photoIdRandom);
+                              }
+                              if (!lockMemeState) {
+                                memeLegende = listMemoto[randomMeme].memostock;
+                              }
+                              memoStockidRandom = listMemoto[randomMeme].memostockid;
+                              legendeController.text = memeLegendeUser;
+                              legendeController.text = memeLegende;
+                              visStar = true;
+                              //legendeController.text =""; // Test
+                              savePRL(); // Ajout pour toutes
+                            });
+                          }
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ElevatedButton(
+
+                        style: ElevatedButton.styleFrom(
+                            primary: Colors.purpleAccent,
+                            padding:
+                            const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                            textStyle: const TextStyle(
+                                fontSize: 14,
+                                backgroundColor: Colors.purpleAccent,
+                                fontWeight: FontWeight.bold)),
+                        child: Text('Category Filter: '  ),
+                          onPressed: () {
+                            setState(() {
+                              boolCategory = !boolCategory;
+                            });
+                          }
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ElevatedButton(
+
+                        style: ElevatedButton.styleFrom(
+                            primary: Colors.purpleAccent,
+                            padding:
+                            const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                            textStyle: const TextStyle(
+                                fontSize: 14,
+                                backgroundColor: Colors.purpleAccent,
+                                fontWeight: FontWeight.bold)),
+                        child: Text('Caption Perso: ' ),
+                          onPressed: () {
+                            setState(() {
+                              boolTexfield = !boolTexfield;
+                            });
+                            //stopTimer();
+                          }
+                      ),
+                    ),
+
+                  ],
+                ),
+                Row(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ElevatedButton(
+
+                        style: ElevatedButton.styleFrom(
+                            primary: Colors.purpleAccent,
+                            padding:
+                            const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                            textStyle: const TextStyle(
+                                fontSize: 14,
+                                backgroundColor: Colors.purpleAccent,
+                                fontWeight: FontWeight.bold)),
+                        child: Text('Caption Lock: '  ),
+                        onPressed: () {
+                          lockMeme();
+
+                        },
+
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ElevatedButton(
+
+                        style: ElevatedButton.styleFrom(
+                            primary: Colors.purpleAccent,
+                            padding:
+                            const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                            textStyle: const TextStyle(
+                                fontSize: 14,
+                                backgroundColor: Colors.purpleAccent,
+                                fontWeight: FontWeight.bold)),
+                        child: Text('Template Lock: '  ),
+                          onPressed: () => { lockPhoto() }
+
+
+
+                    ),
+                    ),
+
+                  ],
+                ),
+              ],
+            )),
+          ),
+        ));
+  }
   getIndexFromPhotoId(_thatPhotoId) {
     int index = 0;
     for (PhotoBase _brocky in listPhotoBase) {
@@ -370,7 +533,6 @@ class _RandoMemeState extends State<RandoMeme> {
       });
     } else {}
   }
-
   Future getPhotoCat() async {
     Uri url = Uri.parse(pathPHP+"getPHOTOCAT.php");
     getPhotoCatState = false;
@@ -396,7 +558,6 @@ class _RandoMemeState extends State<RandoMeme> {
       });
     } else {}
   }
-
   Expanded getViewPhotoCat() {
     setState(() {});
     if (!getPhotoCatState | !getPhotoBaseState) {
@@ -459,7 +620,6 @@ class _RandoMemeState extends State<RandoMeme> {
     }
     initPhotoSelected();
   }
-
   initPhotoSelected() {
 
     photoidSelected.clear();

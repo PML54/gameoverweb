@@ -33,11 +33,8 @@ class GameVote extends StatefulWidget {
 }
 
 class _GameVoteState extends State<GameVote> {
-  TextEditingController legendeController = TextEditingController();
-  String mafoto = 'assets/oursmacron.png';
-  bool myBool = false;
   String ipv4name = "**.**.**";
-  String memeLegende = "";
+
   bool readGameLikeState = false;
   int readGameLikeError = 0;
   int getGameVoteError = 0;
@@ -53,19 +50,64 @@ class _GameVoteState extends State<GameVote> {
 
   int cestCeluiLa = 0;
   bool repaintPRL = true;
-  bool boolTexfield = true;
-  bool booLike = false;
 
+  bool booLike = false;
+  bool feuOrange = true;
+  Color colorCounter = Colors.green;
   final now = DateTime.now();
-  int thatSum = 0;
-  int thatCount = 0;
+
   double thatAverage = 0;
   late int myUid;
+
+  //
+  bool changeStatusGameUserState = false;
+  bool getGamebyCodeState = false;
+  int getGamebyCodeError = 0;
+  List<Games> myGuGame = []; //  only one Games`
+  //  Chrono
+  bool chronoStart = false;
+  Duration countdownDuration = const Duration(seconds: 10000);
+  int timerVoteGame = 0;
+
+  //Duration countdownDuration = Duration();
+  Duration duration = const Duration();
+  Timer? timer;
+  bool countDown = true;
+  int totalSeconds = 0;
+  bool timeOut = false;
+
+  void addTime() {
+    final addSeconds = countDown ? -1 : 1;
+    setState(() {
+      final seconds = duration.inSeconds + addSeconds;
+      if (seconds < 0) {
+        timer?.cancel();
+        timeOut = true;
+      } else {
+        duration = Duration(seconds: seconds);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final myPerso = ModalRoute.of(context)!.settings.arguments as GameCommons;
     myUid = myPerso.myUid;
+    if (!feuOrange && getGamebyCodeState) buildTime();
+    if (feuOrange && getGamebyCodeState) {
+      setState(() {
+        countDown = true;
+        countdownDuration = Duration(seconds: timerVoteGame);
+        duration = Duration(seconds: timerVoteGame);
+        reset();
+
+        startTimer();
+        chronoStart = true;
+        feuOrange = false;
+
+        //
+      });
+    }
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(actions: <Widget>[
@@ -73,20 +115,31 @@ class _GameVoteState extends State<GameVote> {
             child: Row(
               children: [
                 ElevatedButton(
-                    onPressed: () => {Navigator.pop(context)},
+                    onPressed: () => {
+        //  changeStatusGameUser(8);
+          cleanExit()
+                      },
+
                     style: ElevatedButton.styleFrom(
                         primary: Colors.red,
                         padding: const EdgeInsets.symmetric(
                             horizontal: 8, vertical: 5),
                         textStyle: const TextStyle(
                             fontSize: 14,
-                            backgroundColor: Colors.red,
+                            backgroundColor: Colors.blue,
                             fontWeight: FontWeight.bold)),
-                    child: const Text('Exit')),
-                Text(
-                  myPerso.myPseudo + " ",
-                  style: GoogleFonts.averageSans(fontSize: 18.0),
-                ),
+                    child: const Text('Save&Exit')),
+                ElevatedButton(
+                    onPressed: () => {null},
+                    style: ElevatedButton.styleFrom(
+                        primary: Colors.green,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 5),
+                        textStyle: const TextStyle(
+                            fontSize: 14,
+                            backgroundColor: Colors.green,
+                            fontWeight: FontWeight.bold)),
+                    child: Text(myPerso.myPseudo)),
                 Text(PhlCommons.thisGameCode.toString()),
                 Visibility(
                   visible: booLike,
@@ -99,14 +152,16 @@ class _GameVoteState extends State<GameVote> {
                         // createMemeSolo();
                       }),
                 ),
-                Slider(
-                    label: '% Like ',
-                    activeColor: Colors.red,
-                    divisions: 20,
-                    min: 0,
-                    max: 50,
-                    value: thatAverage.toDouble(),
-                    onChanged: (double newValue) {}),
+                Visibility(
+                  visible:
+                      chronoStart && getGamebyCodeState && totalSeconds < 9900,
+                  child: Text('->' + totalSeconds.toString() + 's',
+                      style: TextStyle(
+                          color:
+                              (totalSeconds < 10) ? Colors.red : Colors.white,
+                          fontSize: 18)),
+                ),
+                // Align(child: buildTime()),
               ],
             ),
           ),
@@ -114,6 +169,7 @@ class _GameVoteState extends State<GameVote> {
         body: readGameLikeState
             ? SafeArea(
                 child: Column(children: <Widget>[
+                  //Align(child: buildTime()),
                   Container(
                       alignment: Alignment.bottomLeft,
                       child: Text(
@@ -142,7 +198,9 @@ class _GameVoteState extends State<GameVote> {
                                     style: TextStyle(fontSize: 22),
                                   ),
                                 ),
-                                (listGameLike[cestCeluiLa].mynote == 1)?Text( "1") : Text ("0"),
+                                (listGameLike[cestCeluiLa].mynote == 1)
+                                    ? const Text("1")
+                                    : const Text("0"),
                               ],
                             ),
                             Column(
@@ -154,7 +212,9 @@ class _GameVoteState extends State<GameVote> {
                                     style: TextStyle(fontSize: 22),
                                   ),
                                 ),
-                                (listGameLike[cestCeluiLa].mynote == 2)?Text( "1") : Text ("0"),
+                                (listGameLike[cestCeluiLa].mynote == 2)
+                                    ? const Text("1")
+                                    : const Text("0"),
                               ],
                             ),
                             Column(
@@ -166,7 +226,9 @@ class _GameVoteState extends State<GameVote> {
                                     style: TextStyle(fontSize: 22),
                                   ),
                                 ),
-                                (listGameLike[cestCeluiLa].mynote == 3)?Text( "1") : Text ("0"),
+                                (listGameLike[cestCeluiLa].mynote == 3)
+                                    ? const Text("1")
+                                    : const Text("0"),
                               ],
                             ),
                             Column(
@@ -178,7 +240,9 @@ class _GameVoteState extends State<GameVote> {
                                     style: TextStyle(fontSize: 22),
                                   ),
                                 ),
-                                (listGameLike[cestCeluiLa].mynote == 4)?Text( "1") : Text ("0"),
+                                (listGameLike[cestCeluiLa].mynote == 4)
+                                    ? const Text("1")
+                                    : const Text("0"),
                               ],
                             ),
                             Column(
@@ -190,7 +254,9 @@ class _GameVoteState extends State<GameVote> {
                                     style: TextStyle(fontSize: 22),
                                   ),
                                 ),
-                                (listGameLike[cestCeluiLa].mynote == 5)?Text( "1") : Text ("0"),
+                                (listGameLike[cestCeluiLa].mynote == 5)
+                                    ? const Text("1")
+                                    : const Text("0"),
                               ],
                             ),
                             Column(
@@ -202,18 +268,20 @@ class _GameVoteState extends State<GameVote> {
                                     style: TextStyle(fontSize: 22),
                                   ),
                                 ),
-                                (listGameLike[cestCeluiLa].mynote == 6)?Text( "1") : Text ("0"),
+                                (listGameLike[cestCeluiLa].mynote == 6)
+                                    ? const Text("1")
+                                    : const Text("0"),
                               ],
                             )
                           ],
                         )
-                      : Text('...'),
+                      : const Text('...'),
                   Center(
                       child: Text(
                           'By ' + listGameLike[cestCeluiLa].uid.toString())),
                 ]),
               )
-            : Text(''),
+            : const Text(''),
         bottomNavigationBar: Row(children: [
           IconButton(
               icon: const Icon(Icons.arrow_back),
@@ -235,16 +303,43 @@ class _GameVoteState extends State<GameVote> {
               onPressed: () {
                 nextPRL();
               }),
-          Text(
-            " Moyenne = " + thatAverage.toString(),
-            style: GoogleFonts.averageSans(fontSize: 15.0),
-          ),
+
         ]),
       ),
     );
   }
-  Future createGameVote(int _myUid, int _points) async {
 
+  buildTime() {
+    setState(() {
+      totalSeconds = duration.inSeconds;
+      if (totalSeconds < 10) colorCounter = Colors.red;
+    });
+    if (totalSeconds <= 1) {
+      stopTimer();
+      changeStatusGameUser(4); //has Voted
+      Navigator.pop(context);
+    }
+  }
+
+  Future changeStatusGameUser(int _status) async {
+    // STATUS ONLINE/OFFINE =BIT 1 on
+    // 2 MEMING
+    // 4 MEMECLOSED
+    // 8  VOTING
+    // 16 VOTECLOSED
+    Uri url = Uri.parse(pathPHP + "changeStatusGameUser.php");
+    changeStatusGameUserState = false;
+    var data = {
+      "GAMECODE": PhlCommons.thisGameCode.toString(),
+      "UID": PhlCommons.thatUid.toString(),
+      // +1 CAr  si le GameUSer Vote cest donc quil est en ligne
+      "GUSTATUS": (_status).toString(),
+    };
+    await http.post(url, body: data);
+    changeStatusGameUserState = true;
+  }
+
+  Future createGameVote(int _myUid, int _points) async {
     Uri url = Uri.parse(pathPHP + "createGameVote.php");
 
     var data = {
@@ -255,28 +350,54 @@ class _GameVoteState extends State<GameVote> {
       "UID": _myUid.toString()
     };
     var res = await http.post(url, body: data);
-    var datamysql = jsonDecode(res.body) as List;
-    setState(() {
-
-    });
-
-
+    //var datamysql = jsonDecode(res.body) as List;
+    setState(() {});
   }
 
   Future createGameVoteAll(int _myUid) async {
-    //Uri url = Uri.parse(pathPHP + "createMLV.php");
+
     Uri url = Uri.parse(pathPHP + "createGameVoteAll.php");
 
     for (GameLike _thisVote in listGameLike) {
       var data = {
         "GAMECODE": PhlCommons.thisGameCode.toString(),
-        "MLVPOINTS":  _thisVote.mynote.toString(),
+        "MLVPOINTS": _thisVote.mynote.toString(),
         "MLVDATE": now.toString(),
-        "MEMOLIKEID":  _thisVote.memeid.toString(),
+        "MEMOLIKEID": _thisVote.memeid.toString(),
         "UID": myUid.toString()
       };
-        await http.post(url, body: data);
+      await http.post(url, body: data);
     }
+  }
+
+  Future getGamebyCode() async {
+    int _thisGameCode = PhlCommons.thisGameCode;
+    bool gameCodeFound = true;
+    Uri url = Uri.parse(pathPHP + "getGAMEBYCODE.php");
+    var data = {
+      "GAMECODE": _thisGameCode.toString(),
+    };
+    http.Response response = await http.post(url, body: data);
+    if (response.body.toString() == 'ERR_1001') {
+      gameCodeFound = false;
+      getGamebyCodeState = false;
+      getGamebyCodeError = 1001;
+    } else {
+      gameCodeFound = true;
+    }
+    if (response.statusCode == 200 && (gameCodeFound)) {
+      var datamysql = jsonDecode(response.body) as List;
+      setState(() {
+        myGuGame = datamysql.map((xJson) => Games.fromJson(xJson)).toList();
+        getGamebyCodeState = true;
+        getGamebyCodeError = 0;
+        // On le met à  la source
+        timerVoteGame = myGuGame[0].gametimevote;
+
+        countdownDuration = Duration(seconds: timerVoteGame);
+
+      });
+    } else {}
   }
 
   Future getIP() async {
@@ -285,6 +406,7 @@ class _GameVoteState extends State<GameVote> {
       ipv4name = ipv4;
     });
   }
+
   @override
   void initState() {
     super.initState();
@@ -292,10 +414,14 @@ class _GameVoteState extends State<GameVote> {
     getIP();
     readGameLike(); // Seule Lecture
 
+    getGamebyCode(); // H-eu
+    changeStatusGameUser(3); //Voting
+
     listCountEmo.clear();
     for (int i = 0; i < 6; i++) {
       listCountEmo.add(0);
     }
+    reset();
 
     setState(() {
       if (readGameLikeState) {
@@ -309,6 +435,7 @@ class _GameVoteState extends State<GameVote> {
       print(DateTime.now());
     });
   }
+
   nextPRL() {
     setState(() {
       cestCeluiLa++;
@@ -318,16 +445,19 @@ class _GameVoteState extends State<GameVote> {
       repaintPRL = true;
     });
   }
+
   pressEmoticone(int _myUid, int lequel) {
     setState(() {
-       if ( listGameLike[cestCeluiLa].mynote==lequel)  listGameLike[cestCeluiLa].mynote=0;
-       else listGameLike[cestCeluiLa].mynote=lequel;
-        createGameVote(_myUid, lequel);
-        //nextPRL();
-
-
+      if (listGameLike[cestCeluiLa].mynote == lequel) {
+        listGameLike[cestCeluiLa].mynote = 0;
+      } else {
+        listGameLike[cestCeluiLa].mynote = lequel;
+      }
+      createGameVote(_myUid, lequel);
+      //nextPRL();
     });
   }
+
   prevPRL() {
     setState(() {
       cestCeluiLa--;
@@ -335,6 +465,7 @@ class _GameVoteState extends State<GameVote> {
       repaintPRL = true;
     });
   }
+
   Future readGameLike() async {
     Uri url = Uri.parse(pathPHP + "readGAMELIKE.php");
     readGameLikeState = false;
@@ -345,7 +476,7 @@ class _GameVoteState extends State<GameVote> {
     http.Response response = await http.post(url, body: data);
     if (response.body.toString() == 'ERR_1001') {
       readGameLikeError = 1001; //Not Found
-   }
+    }
     if (response.statusCode == 200 && (readGameLikeError != 1001)) {
       var datamysql = jsonDecode(response.body) as List;
       setState(() {
@@ -356,21 +487,41 @@ class _GameVoteState extends State<GameVote> {
       });
     } else {}
   }
+
   Future readGameVote() async {
     Uri url = Uri.parse(pathPHP + "readGameVote.php");
-
-    var data = {
-      "GAMECODE": PhlCommons.thisGameCode.toString(),
-      "UID": PhlCommons.thatUid.toString()
-    };
 
     http.Response response = await http.post(url);
     if (response.body.toString() == 'ERR_1001') {}
     if (response.statusCode == 200 && (readGameLikeError != 1001)) {
       var datamysql = jsonDecode(response.body) as List;
-      setState(() {
-
-      });
+      setState(() {});
     } else {}
+  }
+
+  void reset() {
+    if (countDown) {
+      setState(() => duration = countdownDuration);
+
+    } else {
+      setState(() => duration = const Duration());
+    }
+  }
+
+  void startTimer() {
+    timer = Timer.periodic(const Duration(seconds: 1), (_) => addTime());
+  }
+
+  void stopTimer({bool resets = true}) {
+    if (resets) {
+      reset();
+    }
+    setState(() => timer?.cancel());
+  }
+  void cleanExit()
+  {
+
+    stopTimer();
+    Navigator.pop(context);
   }
 }

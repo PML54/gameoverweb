@@ -16,7 +16,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:core';
 
-import 'package:dart_ipify/dart_ipify.dart';
 import 'package:flutter/material.dart';
 import 'package:gameover/configgamephl.dart';
 import 'package:gameover/gamephlclass.dart';
@@ -115,11 +114,11 @@ class _GameVoteResultState extends State<GameVoteResult> {
                           '--> ' +
                           listGameLike[cestCeluiLa].mynote.toString() +
                           " Points",
-                          style: TextStyle(fontSize: 22, color: Colors.red),
+                          style: const TextStyle(fontSize: 22, color: Colors.red),
                       )),
                 ]),
               )
-            : Text(''),
+            : const Text(''),
         bottomNavigationBar: Row(children: [
           IconButton(
               icon: const Icon(Icons.arrow_back),
@@ -232,7 +231,7 @@ class _GameVoteResultState extends State<GameVoteResult> {
             }
           }
         }
-       listGameLike.sort((a, b) => b.mynote.compareTo(a.mynote));
+       listGameLike.sort((a, b) => a.mynote.compareTo(b.mynote));
       });
     } else {}
   }

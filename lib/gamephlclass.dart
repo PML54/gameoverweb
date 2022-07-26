@@ -1,5 +1,4 @@
 import 'dart:core';
-
 import 'package:flutter/material.dart';
 
 class CheckMLVU {
@@ -57,7 +56,7 @@ class CheckVotePlus {
   }
 }
 
-//------------>   ClefCodes N°7
+
 class ClefCodes {
   String clefcode = "XXX";
   int clefcodeid = 0;
@@ -75,7 +74,6 @@ class ClefCodes {
   }
 }
 
-//------------>  Evaluations N°6
 class Evaluations {
   int evalpoints = 0;
   int gameid = 0;
@@ -102,11 +100,46 @@ class Evaluations {
   }
 }
 
+class GameAudika {
+ /*
+  | AUDIKAID | CODID | LASTID | GAMECODE | LASTDATE   |
+  +----------+-------+--------+----------+------------+
+  |       96 |     1 |     13 | 80181888 | 2022-07-20 |
+  |       97 |     2 |      0 | 80181888 | 2022-07-20 |
+  |       98 |     3 |      0 | 80181888 | 2022-07-20 |
+
+  */
+  int audikaid = 0;
+  int codid = 0;
+  int lastid =0;
+  int gamecode = 0;
+   String lastdate = "05-05-2022";
+
+  GameAudika({
+    required this.audikaid,
+    required this.codid,
+    required this.lastid,
+    required this.gamecode,
+    required this.lastdate,
+  });
+
+  factory GameAudika.fromJson(Map<String, dynamic> json) {
+    return GameAudika(
+      audikaid: int.parse(json['AUDIKAID']),
+      codid: int.parse(json['CODID']),
+      lastid: int.parse(json['LASTID']),
+      gamecode: int.parse(json['GAMECODE']),
+      lastdate: json['LASTDATE'] as String,
+
+    );
+  }
+}
+
 class GameByUser {
   int uid = 0;
   int gamecode = 0;
-  int status = 0;
-  int gmid=0;
+  int gamestatus = 0;
+  int gmid = 0;
   bool isSelected = false;
   Color extraColor = Colors.grey;
 
@@ -114,13 +147,15 @@ class GameByUser {
     required this.uid,
     required this.gamecode,
     required this.gmid,
+    required this.gamestatus,
   });
 
   factory GameByUser.fromJson(Map<String, dynamic> json) {
     return GameByUser(
       uid: int.parse(json['UID']),
       gamecode: int.parse(json['GAMECODE']),
-      gmid:int.parse(json['GMID']),
+      gmid: int.parse(json['GMID']),
+      gamestatus: int.parse(json['GAMESTATUS']),
     );
   }
 }
@@ -157,7 +192,6 @@ class GameLike {
   }
 }
 
-//------------>  GameMasters N°2
 class GameMasters {
   int gmid = 0; // Auto
   String gmpseudo = "XXXX";
@@ -185,7 +219,6 @@ class GameMasters {
   }
 }
 
-//------------>  GamePhotoSelect N°8
 class GamePhotoSelect {
   int gamecode = 0;
   int photoid = 0;
@@ -216,11 +249,10 @@ class Games {
   int gamenbphotos = 0;
   int gamefilter = 0;
   int gametimememe = 0;
-
   int gametimevote = 0;
   int gametimer = 0;
-
   int gameopen = 0;
+
   bool isSelected = false;
   Color extraColor = Colors.grey;
 
@@ -262,37 +294,49 @@ class Games {
   }
 } // Games
 
-//------------>  GameUsers N°3
 class GameUsers {
   int guid = 0;
+  int uid = 0;
   int gamecode = 0;
   int gustatus = 0;
   String guipv4 = "**.**.**.**";
-  String gudate = "05-05-2022";
-  String gupseudo = "FFFF";
+  String gulast = "05-05-2022";
+  int gustate=0;
+  String uname = "***";
+  int uprofile = 0;
 
-  GameUsers({
-    required this.guid,
-    required this.gamecode,
-    required this.gustatus,
-    required this.guipv4,
-    required this.gudate,
-    required this.gupseudo,
-  });
+
+/*
+ GUID | UID | GAMECODE | GUIPV4 | GULAST              | UNAME     | UPROFILE |
+ */
+  GameUsers(
+      {required this.guid,
+      required this.uid,
+      required this.gamecode,
+      required this.gustatus,
+      required this.guipv4,
+      required this.gulast,
+        required this.gustate,
+      required this.uname,
+      required this.uprofile
+
+      });
 
   factory GameUsers.fromJson(Map<String, dynamic> json) {
     return GameUsers(
       guid: int.parse(json['GUID']),
+      uid: int.parse(json['UID']),
       gamecode: int.parse(json['GAMECODE']),
       gustatus: int.parse(json['GUSTATUS']),
       guipv4: json['GUIPV4'] as String,
-      gudate: json['GULAST'] as String,
-      gupseudo: json['GUPSEUDO'] as String,
+      gulast: json['GULAST'] as String,
+      gustate: int.parse(json['GUSTATE']),
+      uname: json['UNAME'] as String,
+      uprofile: int.parse(json['UPROFILE']),
+
     );
   }
 }
-//
-
 class GameVotes {
   int uid = 0;
   int memeid = 0;
@@ -315,14 +359,14 @@ class GameVotes {
       gamecode: int.parse(json['GAMECODE']),
       gvpoints: int.parse(json['GVPOINTS']),
       gvlast: json['GVLAST'] as String,
+
     );
   }
 }
-
 class GameVotesResult {
   int memeid = 0;
   int gamecode = 0;
-  int  sumg = 0;
+  int sumg = 0;
 
   GameVotesResult({
     required this.memeid,
@@ -339,8 +383,6 @@ class GameVotesResult {
   }
 }
 
-
-//------------>  Memes N°5
 class Memes {
   int memeid = 0;
   int photoid = 0;
@@ -367,7 +409,6 @@ class Memes {
   }
 }
 
-///PHOTOID | MEMOSTOCKID | PHOTOFILENAME                  | PHOTOFILETYPE | MEMOSTOCK
 class MemoLike {
   // En cours
   int memolikeid = 0;
@@ -455,6 +496,7 @@ class MemopolUsersReduce {
   Color extraColor = Colors.grey;
   bool isSelected = false;
 
+  //GUID,GAMEUSERS.UID,GAMECODE,GUIPV4,GULAST,UNAME,UPROFILE
   MemopolUsersReduce({
     required this.uid,
     required this.ustatus,
@@ -493,7 +535,6 @@ class Memoto {
   }
 }
 
-//------------>  PhotoBase  N°4
 class PhotoBase {
   int photofilesize = 0;
   int photoheight = 0;
@@ -541,7 +582,6 @@ class PhotoBase {
   }
 }
 
-//------------>  GameMasters N°2
 class PhotoCat {
   String photocat = "XXXX";
   String photocast = "XXXX";
@@ -576,7 +616,7 @@ class PhotoCat {
   }
 }
 
-//------------>    PhotoClefs  N°9
+
 class PhotoClefs {
   int photoid = 0;
   int clefcodeid = 0;

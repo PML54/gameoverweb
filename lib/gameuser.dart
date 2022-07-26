@@ -5,7 +5,9 @@ import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:gameover/configgamephl.dart';
 import 'package:gameover/gamephlclass.dart';
+
 import 'package:gameover/phlcommons.dart';
+
 import 'package:http/http.dart' as http;
 
 class GameUser extends StatefulWidget {
@@ -39,18 +41,21 @@ class _GameUserState extends State<GameUser> {
   String thatPseudo = PhlCommons.thatPseudo;
   String memeLegende = "";
   bool timeOut = false;
-  int timerMemeGame = 0;
+
   int cestCeluiLa = 0;
   bool getGamebyCodeState = false;
   int getGamebyCodeError = 0;
   bool changeStatusGameUserState = false;
+  bool changeStateGameUserState = false;
+  bool chronoStart = false;
+  Duration countdownDuration = const Duration(seconds: 10000);
+  int timerMemeGame = 0;
 
-  //  Chrono
-  Duration countdownDuration = const Duration(seconds: 59);
+  //Duration countdownDuration = Duration();
   Duration duration = const Duration();
   Timer? timer;
   bool countDown = true;
-
+  Color colorCounter = Colors.green;
 
   void addTime() {
     final addSeconds = countDown ? -1 : 1;
@@ -75,18 +80,7 @@ class _GameUserState extends State<GameUser> {
         Expanded(
           child: Row(
             children: [
-              IconButton(
-                icon: const Icon(Icons.arrow_back),
-                color: Colors.black,
-                iconSize: 30.0,
-                tooltip: 'Home',
-                onPressed: () {
-                  stopTimer();
-                  Navigator.pop(context);
-                },
-              ),
               ElevatedButton(
-                  onPressed: () => {null},
                   style: ElevatedButton.styleFrom(
                       primary: Colors.red,
                       padding: const EdgeInsets.symmetric(
@@ -95,11 +89,31 @@ class _GameUserState extends State<GameUser> {
                           fontSize: 14,
                           backgroundColor: Colors.red,
                           fontWeight: FontWeight.bold)),
+                  child: const Text('Save&Exit'),
+                  onPressed: () {
+                    stopTimer();
+                    Navigator.pop(context);
+                  }),
+              ElevatedButton(
+                  onPressed: () => {null},
+                  style: ElevatedButton.styleFrom(
+                      primary: Colors.green,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 5),
+                      textStyle: const TextStyle(
+                          fontSize: 14,
+                          backgroundColor: Colors.green,
+                          fontWeight: FontWeight.bold)),
                   child: Text(myPerso.myPseudo)),
-              Text(PhlCommons.thisGameCode.toString() +
-                  '   ' +
-                  totalSeconds.toString() +
-                  's')
+              Text(PhlCommons.thisGameCode.toString()),
+              Visibility(
+                visible:
+                    chronoStart && getGamebyCodeState && totalSeconds < 9900,
+                child: Text('->' + totalSeconds.toString() + 's',
+                    style: TextStyle(
+                        color: (totalSeconds < 10) ? Colors.red : Colors.white,
+                        fontSize: 18)),
+              )
             ],
           ),
         ),
@@ -111,38 +125,57 @@ class _GameUserState extends State<GameUser> {
           getListView(),
         ]),
       ),
-      bottomNavigationBar: Visibility(
-        // visible: !timeOut,
-        visible: true,
-        child: IconButton(
-            icon: const Icon(Icons.save),
-            iconSize: 35,
-            color: Colors.red,
-            tooltip: 'Save Selection',
+      bottomNavigationBar: Row(
+        children: [
+
+      ElevatedButton(
+      style: ElevatedButton.styleFrom(
+      primary: Colors.red,
+          padding: const EdgeInsets.symmetric(
+              horizontal: 8, vertical: 5),
+          textStyle: const TextStyle(
+              fontSize: 14,
+              backgroundColor: Colors.red,
+              fontWeight: FontWeight.bold)),
+            child: const Text('Save&Exit'),
             onPressed: () {
               createMeme();
               stopTimer();
-              changeStatusGameUser(2);
+              if (PhlCommons.thatStatus < 2) changeStatusGameUser(2);
               Navigator.pop(context);
             }),
+
+        ],
       ),
     ));
   }
 
   buildTime() {
-
-    totalSeconds = duration.inMinutes * 60 + duration.inSeconds;
-
+    setState(() {
+      totalSeconds = duration.inSeconds;
+      if (totalSeconds < 10) colorCounter = Colors.red;
+    });
     if (totalSeconds <= 1) {
       createMeme();
       stopTimer();
-      changeStatusGameUser(4);//MEME CLOSED
+      if (PhlCommons.thatStatus < 2) changeStatusGameUser(2); //MEME CLOSED
       Navigator.pop(context);
     }
   }
 
-  Future changeStatusGameUser(int _status) async {
+  Future changeStateGameUser(int _state) async {
+    Uri url = Uri.parse(pathPHP + "changeStateGameUser.php");
+    changeStateGameUserState = false;
+    var data = {
+      "GAMECODE": PhlCommons.thisGameCode.toString(),
+      "UID": PhlCommons.thatUid.toString(),
+      "GUSTATE": (_state).toString(),
+    };
+    await http.post(url, body: data);
+    changeStateGameUserState = true;
+  }
 
+  Future changeStatusGameUser(int _status) async {
     // STATUS ONLINE/OFFINE =BIT 1 on
     // 2 MEMING
     // 4 MEMECLOSED
@@ -154,7 +187,7 @@ class _GameUserState extends State<GameUser> {
       "GAMECODE": PhlCommons.thisGameCode.toString(),
       "UID": PhlCommons.thatUid.toString(),
       // +1 CAr  si le GameUSer Vote cest donc quil est en ligne
-      "GUSTATUS": (_status +1) .toString(),
+      "GUSTATUS": (_status).toString(),
     };
     await http.post(url, body: data);
     changeStatusGameUserState = true;
@@ -198,6 +231,10 @@ class _GameUserState extends State<GameUser> {
         myGuGame = datamysql.map((xJson) => Games.fromJson(xJson)).toList();
         getGamebyCodeState = true;
         getGamebyCodeError = 0;
+        // On le met à  la source
+        timerMemeGame = myGuGame[0].gametimememe;
+        //countdownDuration = const Duration(seconds: 100);
+        countdownDuration = Duration(seconds: timerMemeGame);
         getGamePhotoSelect(); // Il faut le GameCore
       });
     } else {}
@@ -230,7 +267,6 @@ class _GameUserState extends State<GameUser> {
   Future getGamePhotoSelect() async {
     getGamePhotoSelectState = false;
     getGamePhotoSelectError = -1;
-
     Uri url = Uri.parse(pathPHP + "getGAMEPHOTOS.php");
 
     var data = {
@@ -253,7 +289,9 @@ class _GameUserState extends State<GameUser> {
   }
 
   Expanded getget() {
-    if (!getGamebyUidState || !getGamePhotoSelectState) {
+    if (!getGamebyUidState ||
+        !getGamePhotoSelectState ||
+        PhlCommons.thatStatus >= 4) {
       return Expanded(
         child: Column(
           children: const [
@@ -273,6 +311,8 @@ class _GameUserState extends State<GameUser> {
       children: [
         TextField(
           controller: legendeController,
+          keyboardType: TextInputType.multiline,
+          maxLines: 2,
           decoration: const InputDecoration(
             border: OutlineInputBorder(),
             labelText: "Meme?",
@@ -309,12 +349,17 @@ class _GameUserState extends State<GameUser> {
       setState(() {
         //
         timerMemeGame = myGuGame[0].gametimememe;
-        countdownDuration = Duration(seconds: timerMemeGame);
+        //      reset();
 
-        reset();
         countDown = true;
+        countdownDuration = Duration(seconds: timerMemeGame);
+        duration = Duration(seconds: timerMemeGame);
+        reset();
+
         startTimer();
+        chronoStart = true;
         feuOrange = false;
+
         //
       });
     }
@@ -327,20 +372,13 @@ class _GameUserState extends State<GameUser> {
               title: Row(
                 children: [
                   Expanded(
-                    child: Container(
-                      /*margin: const EdgeInsets.all(2.0),
-                        padding: const EdgeInsets.all(2.0),0
-                        decoration: BoxDecoration(
-                            color: listPhotoBase[index].extraColor,
-                            border: Border.all()),*/
-                      child: Image.network(
-                        "upload/" +
-                            listPhotoBase[index].photofilename +
-                            "." +
-                            listPhotoBase[index].photofiletype,
-                        /*width: (listPhotoBase[index].extraWidth),
-                              height: (listPhotoBase[index].extraHeight),*/
-                      ),
+                    child: Image.network(
+                      "upload/" +
+                          listPhotoBase[index].photofilename +
+                          "." +
+                          listPhotoBase[index].photofiletype,
+                      /*width: (listPhotoBase[index].extraWidth),
+                            height: (listPhotoBase[index].extraHeight),*/
                     ),
                   ),
                 ],
@@ -378,16 +416,19 @@ class _GameUserState extends State<GameUser> {
   @override
   void initState() {
     super.initState();
-    reset();
+
     getGamebyUidState = true;
     getGamebyCode(); // H-eu
+    reset();
+    changeStateGameUser(1);
 
-    changeStatusGameUser(2);//MEMING 
+    changeStatusGameUser(1); //MEMING
   }
 
   void reset() {
     if (countDown) {
       setState(() => duration = countdownDuration);
+      duration = countdownDuration;
     } else {
       setState(() => duration = const Duration());
     }
@@ -395,8 +436,6 @@ class _GameUserState extends State<GameUser> {
 
   void startTimer() {
     timer = Timer.periodic(const Duration(seconds: 1), (_) => addTime());
-
-
   }
 
   void stopTimer({bool resets = true}) {
