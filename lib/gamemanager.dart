@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:core';
 import 'dart:math';
-
 import 'package:clipboard/clipboard.dart';
 import 'package:flutter/material.dart';
 import 'package:gameover/configgamephl.dart';
@@ -16,7 +15,6 @@ class ButtonWidget extends StatelessWidget {
   final Color color;
   final Color backgroundColor;
   final VoidCallback onClicked;
-
   const ButtonWidget(
       {Key? key,
       required this.text,
@@ -39,7 +37,6 @@ class ButtonWidget extends StatelessWidget {
 
 class GameManager extends StatefulWidget {
   const GameManager({Key? key}) : super(key: key);
-
   @override
   State<GameManager> createState() => _GameManagerState();
 }
@@ -75,7 +72,6 @@ class _GameManagerState extends State<GameManager> {
     // Attention mal  placé
     myPerso = ModalRoute.of(context)!.settings.arguments as GameCommons;
     gameNameController.text = thatGameCodeString;
-
     return MaterialApp(
         debugShowCheckedModeBanner: false,
         title: thatGM,
@@ -173,7 +169,6 @@ class _GameManagerState extends State<GameManager> {
               ),
             ),
             //show linear gradient background of page
-
             padding: const EdgeInsets.all(20),
 
             child: Column(
@@ -475,7 +470,7 @@ class _GameManagerState extends State<GameManager> {
   }
 
   Future newGame() async {
-    int _gameStatus = 1; // PHOTOCLOSED
+    int _gameStatus = 0; // PHOTOCLOSED
     int _gameNbGamersActifs = 0;
     int _gameFilter = 0;
     int _thatMode = 0;
@@ -504,11 +499,12 @@ class _GameManagerState extends State<GameManager> {
     Uri url = Uri.parse(pathPHP + "createGAME.php");
     createGameState = false;
     createGameError = -1;
-
+// onforce status à Zero
+    int _forceStatus=0;
     var data = {
       "GAMECODE": PhlCommons.gameActif.gamecode.toString(),
       "GAMEMODE": PhlCommons.gameActif.gamemode.toString(),
-      "GAMESTATUS": PhlCommons.gameActif.gamestatus.toString(),
+      "GAMESTATUS": _forceStatus.toString(),
       "GAMENAME": PhlCommons.gameActif.gamename,
       "GAMEDATE": PhlCommons.gameActif.gamedate,
       "GMID": myPerso.myUid.toString(),

@@ -19,6 +19,7 @@ class GameUser extends StatefulWidget {
 
 class _GameUserState extends State<GameUser> {
   GameCommons myPerso = GameCommons("xxxx", 0, 0);
+  bool _validateKBD = false;
   bool myBool = false;
   bool feuOrange = true;
   List<Games> myGuGame = []; //  only one Games
@@ -71,6 +72,12 @@ class _GameUserState extends State<GameUser> {
   }
 
   @override
+  void dispose() {
+    legendeController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     myPerso = ModalRoute.of(context)!.settings.arguments as GameCommons;
 
@@ -91,6 +98,8 @@ class _GameUserState extends State<GameUser> {
                           fontWeight: FontWeight.bold)),
                   child: const Text('Save&Exit'),
                   onPressed: () {
+                   createMeme();
+                    changeStatusGameUser(2);
                     stopTimer();
                     Navigator.pop(context);
                   }),
@@ -127,24 +136,22 @@ class _GameUserState extends State<GameUser> {
       ),
       bottomNavigationBar: Row(
         children: [
-
-      ElevatedButton(
-      style: ElevatedButton.styleFrom(
-      primary: Colors.red,
-          padding: const EdgeInsets.symmetric(
-              horizontal: 8, vertical: 5),
-          textStyle: const TextStyle(
-              fontSize: 14,
-              backgroundColor: Colors.red,
-              fontWeight: FontWeight.bold)),
-            child: const Text('Save&Exit'),
-            onPressed: () {
-              createMeme();
-              stopTimer();
-              if (PhlCommons.thatStatus < 2) changeStatusGameUser(2);
-              Navigator.pop(context);
-            }),
-
+          ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                  primary: Colors.red,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                  textStyle: const TextStyle(
+                      fontSize: 14,
+                      backgroundColor: Colors.red,
+                      fontWeight: FontWeight.bold)),
+              child: const Text('Save&Exit'),
+              onPressed: () {
+                createMeme();
+                stopTimer();
+                changeStatusGameUser(2);
+                Navigator.pop(context);
+              }),
         ],
       ),
     ));
@@ -158,7 +165,7 @@ class _GameUserState extends State<GameUser> {
     if (totalSeconds <= 1) {
       createMeme();
       stopTimer();
-      if (PhlCommons.thatStatus < 2) changeStatusGameUser(2); //MEME CLOSED
+      changeStatusGameUser(2); //MEME CLOSED
       Navigator.pop(context);
     }
   }
@@ -176,20 +183,15 @@ class _GameUserState extends State<GameUser> {
   }
 
   Future changeStatusGameUser(int _status) async {
-    // STATUS ONLINE/OFFINE =BIT 1 on
-    // 2 MEMING
-    // 4 MEMECLOSED
-    // 8  VOTING
-    // 16 VOTECLOSED
     Uri url = Uri.parse(pathPHP + "changeStatusGameUser.php");
     changeStatusGameUserState = false;
     var data = {
       "GAMECODE": PhlCommons.thisGameCode.toString(),
       "UID": PhlCommons.thatUid.toString(),
-      // +1 CAr  si le GameUSer Vote cest donc quil est en ligne
       "GUSTATUS": (_status).toString(),
     };
     await http.post(url, body: data);
+    PhlCommons.thatStatus = _status;
     changeStatusGameUserState = true;
   }
 
@@ -202,7 +204,7 @@ class _GameUserState extends State<GameUser> {
         "UID": PhlCommons.thatUid.toString(),
         "MEMETEXT": _brocky.memetempo,
       };
-
+print (" _brocky.memetempo.l"+_brocky.memetempo );
       if (_brocky.memetempo.length > 1) {
         await http.post(url, body: data);
       }
@@ -327,6 +329,22 @@ class _GameUserState extends State<GameUser> {
             });
           },
         ),
+        ElevatedButton(
+            style: ElevatedButton.styleFrom(
+                primary: Colors.red,
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 8, vertical: 5),
+                textStyle: const TextStyle(
+                    fontSize: 14,
+                    backgroundColor: Colors.green,
+                    fontWeight: FontWeight.bold)),
+            child: const Text('Save&Next'),
+            onPressed: () {
+              setState(() {
+                cestCeluiLa++; if (cestCeluiLa >=listPhotoBase.length ) cestCeluiLa=0;
+              });
+            }),
+
         Image.network(
           "upload/" +
               listPhotoBase[cestCeluiLa].photofilename +
@@ -335,6 +353,8 @@ class _GameUserState extends State<GameUser> {
           width: (listPhotoBase[cestCeluiLa].extraWidth * 2),
           height: (listPhotoBase[cestCeluiLa].extraHeight * 2),
         ),
+
+
       ],
     )));
   }
@@ -387,7 +407,9 @@ class _GameUserState extends State<GameUser> {
                 setState(() {
                   cestCeluiLa = index;
                 });
-              });
+              }
+
+              );
         });
     return (Expanded(child: listView));
   }
@@ -444,4 +466,7 @@ class _GameUserState extends State<GameUser> {
     }
     setState(() => timer?.cancel());
   }
+
+
+
 }

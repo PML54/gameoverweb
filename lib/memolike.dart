@@ -95,8 +95,8 @@ class _MemolikeState extends State<Memolike> {
           ),
         ]),
 
-        //body: readMemolikeVoteState
-        body: readMemolikeState|true
+
+        body: readMemolikeState
             ? SafeArea(
                 child: Column(children: <Widget>[
                   Container(
@@ -242,11 +242,15 @@ class _MemolikeState extends State<Memolike> {
 
     setState(() {
       getMLVU();
+
       listCheckVote =
           datamysql.map((xJson) => CheckVotePlus.fromJson(xJson)).toList();
       updateThisMli(listMemoLike[cestCeluiLa].memolikeid);
       thatAverage =
           (updateThisMli(listMemoLike[cestCeluiLa].memolikeid)).toDouble();
+      print (" Sotie  N°2  de GetMLVU");
+
+
     });
   }
 
@@ -261,7 +265,7 @@ class _MemolikeState extends State<Memolike> {
   Future getMLVU() async {
     Uri url = Uri.parse(pathPHP + "getMLV.php");
     listCheckMlvuState = false;
-
+print (" Get MlVU AVAT");
     http.Response response = await http.post(url);
     if (response.body.toString() == 'ERR_1001') {}
     if (response.statusCode == 200 && (getMemolikeError != 1001)) {
@@ -270,6 +274,7 @@ class _MemolikeState extends State<Memolike> {
         listCheckMlvu =
             datamysql.map((xJson) => CheckMLVU.fromJson(xJson)).toList();
         listCheckMlvuState = true;
+        print (" Get MlVU APREST");
       });
     } else {}
   }
@@ -317,7 +322,10 @@ class _MemolikeState extends State<Memolike> {
   }
 
   pressEmoticone(int _myUid, int lequel) {
+    if (_myUid==0) _myUid=999;
     setState(() {
+      print ("_myUid "+ _myUid.toString());
+      print ("lequel "+ lequel.toString());
       createMemolikeVote(_myUid, lequel);
     });
   }
@@ -338,6 +346,8 @@ class _MemolikeState extends State<Memolike> {
   Future readMemolike() async {
     Uri url = Uri.parse(pathPHP + "readMEMOLIKE.php");
     readMemolikeState = false;
+
+
     http.Response response = await http.post(url);
     if (response.body.toString() == 'ERR_1001') {
       getMemolikeError = 1001; //Not Found
@@ -348,8 +358,11 @@ class _MemolikeState extends State<Memolike> {
         getMemolikeError = 0;
         listMemoLike =
             datamysql.map((xJson) => MemoLike.fromJson(xJson)).toList();
+
+        print (" Apres readMEMOLIKE.php");
         readMemolikeState = true;
         readMemolikeVote();
+        print (" Après readMemolikeVote()");
       });
     } else {}
   }
@@ -366,6 +379,8 @@ class _MemolikeState extends State<Memolike> {
     if ('ERROR_1000'.compareTo (riponse) == 0) {
       readMemolikeVoteError = 1000; //Not Found
       readMemolikeVoteState = true; // Vide Mais corect
+
+      print ("ERRR_1000");
     }
      if (res.statusCode == 200 && (readMemolikeVoteError != 1000)) {
       var datamysql = jsonDecode(res.body) as List;

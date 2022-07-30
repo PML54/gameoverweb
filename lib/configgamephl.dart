@@ -17,6 +17,15 @@ List statusGame = [
   "Résultats",
       "Aborted"
 ];
+List statusGU = [
+  "Attend",
+  "Commente",
+  "a Commenté",
+  "Vote",
+  "a Voté",
+  "Resultats",
+  "Aborted"
+];
 List modeGame = ["PUBLIC", "PRIVATE"];
 List msgNewGame = ["Nom Game ?", "Photos Selected ? "];
 List statusUser = ["DISABLED", "ENABLED"];

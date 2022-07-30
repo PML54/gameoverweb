@@ -35,7 +35,7 @@ class _SelectGamersState extends State<SelectGamers> {
                 icon: const Icon(Icons.arrow_back),
                 color: Colors.black,
                 iconSize: 30.0,
-                tooltip: 'Home',
+                tooltip: ' Home',
                 onPressed: () {
                   Navigator.pop(context);
                 },
@@ -193,7 +193,7 @@ class _SelectGamersState extends State<SelectGamers> {
     String thisParam = "";
     int _gamecode = PhlCommons.thisGameCode;
     for (MemopolUsersReduce _brocky in listMemopolUsers) {
-      if (_brocky.isSelected) {
+      if (_brocky.isSelected || _brocky.uid == PhlCommons.thatUid) {
         thisParam = thisParam + "|" + _brocky.uid.toString();
       }
     }

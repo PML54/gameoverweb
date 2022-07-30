@@ -231,7 +231,7 @@ class _GameVoteResultState extends State<GameVoteResult> {
             }
           }
         }
-       listGameLike.sort((a, b) => a.mynote.compareTo(b.mynote));
+       listGameLike.sort((a, b) => b.mynote.compareTo(a.mynote));
       });
     } else {}
   }

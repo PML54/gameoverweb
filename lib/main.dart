@@ -15,8 +15,13 @@ import 'package:gameover/randomeme.dart';
 import 'package:gameover/supervisorgames.dart';
 import 'package:gameover/userconnect.dart';
 import 'package:gameover/usercreate.dart';
+import 'package:gameover/megarandom.dart';
+import 'package:gameover/admin/adminphotos.dart';
+
+
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
+import 'package:animated_text_kit/animated_text_kit.dart';
 
 import 'phlcommons.dart';
 
@@ -50,7 +55,7 @@ class _MenoPaulState extends State<MenoPaul> {
   int gameCodeFetched = 0;
   String connectedGuy = "";
   List<MemopolUsers> listMemopolUsers = [];
-  GameCommons myPerso = GameCommons("xxxx", 0, 0);
+  GameCommons myPerso = GameCommons("", 0, 0);
 
   @override
   Widget build(BuildContext context) {
@@ -62,13 +67,18 @@ class _MenoPaulState extends State<MenoPaul> {
             ));
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'V20.0700 : ' + myPerso.myPseudo + ' ',
-          style: GoogleFonts.averageSans(fontSize: 18.0),
-        ),
-      ),
+          title: Text(
+            'lamemopole.com V3004 ' + myPerso.myPseudo,
+            style: GoogleFonts.averageSans(fontSize: 15.0),
+          ),
+          leading: IconButton(
+              icon: Image.asset('assets/marin2.png'),
+              onPressed: () {
+                print("Version  ");
+              })),
       body: SingleChildScrollView(
         child: Container(
+          height:400,
           constraints:
               BoxConstraints(minHeight: MediaQuery.of(context).size.height
                   //set minimum height equal to 100% of VH
@@ -87,106 +97,174 @@ class _MenoPaulState extends State<MenoPaul> {
               ],
             ),
           ),
-          //show linear gradient background of page
-          padding: const EdgeInsets.all(20),
-          child: Padding(
-            padding: const EdgeInsets.all(25.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Visibility(
-                  visible: !isGamer,
-                  child: Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: ElevatedButton(
-                      child: Text(
-                        'CONNEXION',
-                        style: GoogleFonts.averageSans(fontSize: 20.0),
-                      ),
-                      onPressed: () async {
-                        listMemopolUsers = await (Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => LoginPage()),
-                        ));
-                        setState(() {
-                          connectedGuy = listMemopolUsers[0].uname;
-                          if (listMemopolUsers[0].uprofile & 128 == 128) {
-                            isAdmin = true;
-                          }
-                          if (listMemopolUsers[0].uprofile & 1 == 1) {
-                            isGamer = true;
-                          }
-                          myPerso.myPseudo = listMemopolUsers[0].uname;
-                          myPerso.myProfile = listMemopolUsers[0].uprofile;
-                          myPerso.myUid = listMemopolUsers[0].uid;
-                        });
-                      },
+          child: Column(
+            children: [
+    /*          AnimatedTextKit(
+                totalRepeatCount: 1,
+                animatedTexts: [
+                  FadeAnimatedText(
+                    'LAMEMOPOLE Private',
+                    textStyle: TextStyle(
+                        fontSize: 25.0, fontWeight: FontWeight.bold),
+                  ),
+                  ScaleAnimatedText(
+                    'Access Control',
+                    textStyle:
+                        TextStyle(fontSize: 25.0, fontFamily: 'Canterbury'),
+                  ),
+                ],
+              ),*/
+              Visibility(
+                visible: isGamer || true,
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: ElevatedButton(
+                    child: Text(
+                      'My LOBBIES',
+                      style: GoogleFonts.averageSans(fontSize: 25.0),
                     ),
+                    onPressed: () {
+                      PhlCommons.thisGameCode = -1;
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const GameSupervisor(),
+                          settings: RouteSettings(
+                            arguments: myPerso,
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ),
+              ),
+              Visibility(
+                visible: isGamer || true,
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: ElevatedButton(
+                    child: Text(
+                      'New LOBBY',
+                      style: GoogleFonts.averageSans(fontSize: 25.0),
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => GameManager(),
+                          settings: RouteSettings(
+                            arguments: myPerso,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+     /*         AnimatedTextKit(
+                totalRepeatCount: 1,
+                animatedTexts: [
+                  FadeAnimatedText(
+                    'LAMEMOPOLE Public.',
+                    textStyle: TextStyle(
+                        fontSize: 25.0, fontWeight: FontWeight.bold),
+                  ),
+                  ScaleAnimatedText(
+                    'Open Access',
+                    textStyle:
+                        TextStyle(fontSize: 25.0, fontFamily: 'Canterbury'),
+                  ),
+                ],
+              ),*/
+              Visibility(
+                visible: true,
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: ElevatedButton(
+                    child: Text(
+                      'FAVORI',
+                      style: GoogleFonts.averageSans(fontSize: 25.0),
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Memolike(),
+                          settings: RouteSettings(
+                            arguments: myPerso,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+              //MegaRandom
+              Visibility(
+                visible: true,
+                child:
+
                 Row(
                   children: [
-                    Visibility(
-                      visible: isGamer,
-                      child: Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: ElevatedButton(
-                          child: Text(
-                            'My LOBBIES',
-                            style: GoogleFonts.averageSans(fontSize: 18.0),
-                          ),
-                          onPressed: () {
-                            PhlCommons.thisGameCode = -1;
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                //      builder: (context) => const ConnectGame()),
-                                builder: (context) => const GameSupervisor(),
-                                settings: RouteSettings(
-                                  arguments: myPerso,
-                                ),
-                              ),
-                            );
-                          },
+                    Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: ElevatedButton(
+                        child: Text(
+                          'RANDOM',
+                          style: GoogleFonts.averageSans(fontSize: 25.0),
                         ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => RandoMeme(),
+                              settings: RouteSettings(
+                                arguments: myPerso,
+                              ),
+                            ),
+                          );
+                        },
                       ),
                     ),
-                    Visibility(
-                      visible: isGamer,
-                      child: Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: ElevatedButton(
-                          child: Text(
-                            'New  LOBBY',
-                            style: GoogleFonts.averageSans(fontSize: 18.0),
-                          ),
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => GameManager(),
-                                settings: RouteSettings(
-                                  arguments: myPerso,
-                                ),
-                              ),
-                            );
-                          },
+                    Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: ElevatedButton(
+                        child: Text(
+                          'MEGA RANDOM',
+                          style: GoogleFonts.averageSans(fontSize: 25.0),
                         ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => MegaRandom(),
+                              settings: RouteSettings(
+                                arguments: myPerso,
+                              ),
+                            ),
+                          );
+                        },
                       ),
                     ),
                   ],
                 ),
-                Row(
+              ),
+              Padding(
+                padding: const EdgeInsets.all(25.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+
                     Visibility(
-                      visible: isGamer,
+                      visible: isAdmin,
                       child: Padding(
                         padding: const EdgeInsets.all(10.0),
                         child: ElevatedButton(
                           child: Text(
                             'CAPTION',
-                            style: GoogleFonts.averageSans(fontSize: 15.0),
+                            style:
+                                GoogleFonts.averageSans(fontSize: 15.0),
                           ),
                           onPressed: () {
                             Navigator.push(
@@ -202,29 +280,84 @@ class _MenoPaulState extends State<MenoPaul> {
                         ),
                       ),
                     ),
-                  ],
-                ),
-                Visibility(
-                  visible: isAdmin,
-                  child: Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: ElevatedButton(
-                      child: Text(
-                        'ADMIN',
-                        style: GoogleFonts.averageSans(fontSize: 15.0),
-                      ),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const AdminGame()),
-                        );
-                      },
+                    Row(
+                      children: [
+                        Visibility(
+                          visible: isAdmin,
+                          child: Padding(
+                            padding: const EdgeInsets.all(10.0),
+                            child: ElevatedButton(
+                              child: Text(
+                                'ADMIN',
+                                style: GoogleFonts.averageSans(fontSize: 15.0),
+                              ),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => const AdminGame()),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                        Visibility(
+                          visible: isAdmin,
+                          child: Padding(
+                            padding: const EdgeInsets.all(10.0),
+                            child: ElevatedButton(
+                              child: Text(
+                                'ADMIN PHOTOS',
+                                style: GoogleFonts.averageSans(fontSize: 15.0),
+                              ),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => const AdminPhotos()),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+
+                      ],
                     ),
-                  ),
-                ),
-                Row(
-                  children: [
+                    Visibility(
+                      visible: !isGamer,
+                      child: Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: ElevatedButton(
+                          child: Text(
+                            'CONNEXION',
+                            style:
+                                GoogleFonts.averageSans(fontSize: 15.0),
+                          ),
+                          onPressed: () async {
+                            listMemopolUsers = await (Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => LoginPage()),
+                            ));
+                            setState(() {
+                              connectedGuy = listMemopolUsers[0].uname;
+                              if (listMemopolUsers[0].uprofile & 128 ==
+                                  128) {
+                                isAdmin = true;
+                              }
+                              if (listMemopolUsers[0].uprofile & 4 == 4) {
+                                isGamer = true;
+                              }
+                              myPerso.myPseudo =
+                                  listMemopolUsers[0].uname;
+                              myPerso.myProfile =
+                                  listMemopolUsers[0].uprofile;
+                              myPerso.myUid = listMemopolUsers[0].uid;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
                     Visibility(
                       visible: !isGamer,
                       child: Padding(
@@ -232,7 +365,8 @@ class _MenoPaulState extends State<MenoPaul> {
                         child: ElevatedButton(
                           child: Text(
                             'NEW GAMER',
-                            style: GoogleFonts.averageSans(fontSize: 15.0),
+                            style:
+                                GoogleFonts.averageSans(fontSize: 15.0),
                           ),
                           onPressed: () {
                             Navigator.push(
@@ -244,56 +378,10 @@ class _MenoPaulState extends State<MenoPaul> {
                         ),
                       ),
                     ),
-                    Visibility(
-                      visible: isGamer,
-                      child: Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: ElevatedButton(
-                          child: Text(
-                            'FAVORI',
-                            style: GoogleFonts.averageSans(fontSize: 15.0),
-                          ),
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => Memolike(),
-                                settings: RouteSettings(
-                                  arguments: myPerso,
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                    Visibility(
-                      visible: isGamer,
-                      child: Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: ElevatedButton(
-                          child: Text(
-                            'RANDOM',
-                            style: GoogleFonts.averageSans(fontSize: 15.0),
-                          ),
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => RandoMeme(),
-                                settings: RouteSettings(
-                                  arguments: myPerso,
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ),
                   ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
@@ -301,12 +389,9 @@ class _MenoPaulState extends State<MenoPaul> {
         visible: true,
         child: IconButton(
           icon: const Icon(Icons.help_center),
-          /*     showSimpleNotification(
-                    Text("this is a message from simple notification"),
-                    background: Colors.green);*/
           iconSize: 35,
           color: Colors.green,
-          tooltip: 'Unused',
+          tooltip: 'Aide',
           onPressed: () {
             Navigator.push(
               context,
@@ -365,7 +450,7 @@ class _MenoPaulState extends State<MenoPaul> {
 
   @override
   void initState() {
-    //  super.initState();
+    super.initState();
 
     initConnectivity();
     _connectivitySubscription =

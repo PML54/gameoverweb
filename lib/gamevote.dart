@@ -332,7 +332,7 @@ class _GameVoteState extends State<GameVote> {
     var data = {
       "GAMECODE": PhlCommons.thisGameCode.toString(),
       "UID": PhlCommons.thatUid.toString(),
-      // +1 CAr  si le GameUSer Vote cest donc quil est en ligne
+
       "GUSTATUS": (_status).toString(),
     };
     await http.post(url, body: data);
@@ -412,7 +412,7 @@ class _GameVoteState extends State<GameVote> {
     super.initState();
     cestCeluiLa = 0;
     getIP();
-    readGameLike(); // Seule Lecture
+    readGameLike(); // Seule Lecture  GameLike
 
     getGamebyCode(); // H-eu
     changeStatusGameUser(3); //Voting
@@ -447,6 +447,9 @@ class _GameVoteState extends State<GameVote> {
   }
 
   pressEmoticone(int _myUid, int lequel) {
+
+
+    if (listGameLike[cestCeluiLa].uid == _myUid) return;
     setState(() {
       if (listGameLike[cestCeluiLa].mynote == lequel) {
         listGameLike[cestCeluiLa].mynote = 0;
@@ -520,7 +523,7 @@ class _GameVoteState extends State<GameVote> {
   }
   void cleanExit()
   {
-
+    changeStatusGameUser(4); //Voting
     stopTimer();
     Navigator.pop(context);
   }

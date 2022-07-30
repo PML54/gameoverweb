@@ -5,19 +5,19 @@ class CheckMLVU {
   //"SELECT MEMOLIKEID,UID, MLVPOINTS  from MEMOLIKEVOTE  order by MEMOLIKEID";
   int memolikeid = 0;
   int mlvpoints = 0;
-  int uid = 0; //nb Votes avec cette nore
+  int cumu = 0; //nb Votes avec cette nore
 
   CheckMLVU({
     required this.memolikeid,
     required this.mlvpoints,
-    required this.uid,
+    required this.cumu,
   });
 
   factory CheckMLVU.fromJson(Map<String, dynamic> json) {
     return CheckMLVU(
       memolikeid: int.parse(json['MEMOLIKEID']),
       mlvpoints: int.parse(json['MLVPOINTS']),
-      uid: int.parse(json['UID']),
+      cumu: int.parse(json['CUMU']),
     );
   }
 }
@@ -55,7 +55,43 @@ class CheckVotePlus {
     );
   }
 }
+//  "SELECT SURCAT, CATRED,CATFULL FROM SUPERCAT  ORDER BY CATRED, SURCAT";
+class SurCat {
+  String surcat= "XXX";
+  String catred= "XXX";
+  String catfull= "XXX";
+  int nbphotos = 0;
+  int selected = 0;
+  int firstphotoid = 0;
 
+  SurCat({
+    required this.surcat,
+    required this.catred,
+    required this.catfull,
+
+  });
+
+  factory SurCat.fromJson(Map<String, dynamic> json) {
+    return SurCat(
+      surcat: json['SURCAT'] as String,
+      catred: json['CATRED'] as String,
+      catfull: json['CATFULL'] as String
+    );
+  }
+  setNumber(int _number) {
+    nbphotos = _number;
+  }
+
+  setphotoid(_thatphotoid) {
+    firstphotoid = _thatphotoid;
+  }
+
+  setSelected(int _selected) {
+    selected = _selected;
+  }
+
+
+}
 
 class ClefCodes {
   String clefcode = "XXX";
@@ -140,9 +176,12 @@ class GameByUser {
   int gamecode = 0;
   int gamestatus = 0;
   int gmid = 0;
+
+  // Du plus
+  int gustatus=0; // Le stayu du conecté dans ce game
   bool isSelected = false;
   Color extraColor = Colors.grey;
-
+  int uidaction =0;   // <0 rienW><1 doit commenter>   <=2 doit Voter >  <3 doit regarder>
   GameByUser({
     required this.uid,
     required this.gamecode,
@@ -306,6 +345,7 @@ class GameUsers {
   int uprofile = 0;
 
 
+
 /*
  GUID | UID | GAMECODE | GUIPV4 | GULAST              | UNAME     | UPROFILE |
  */
@@ -318,7 +358,8 @@ class GameUsers {
       required this.gulast,
         required this.gustate,
       required this.uname,
-      required this.uprofile
+      required this.uprofile,
+
 
       });
 
@@ -333,6 +374,7 @@ class GameUsers {
       gustate: int.parse(json['GUSTATE']),
       uname: json['UNAME'] as String,
       uprofile: int.parse(json['UPROFILE']),
+
 
     );
   }
