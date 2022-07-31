@@ -32,7 +32,7 @@ class _GameHelpState extends State<GameHelp> {
 
   int cestCeluiLa = 1;
   bool repaintPRL = true;
-String   monaide="help/Help110.png";
+String   monaide="help/Help1.jpeg";
 
   @override
   Widget build(BuildContext context) {
@@ -46,26 +46,28 @@ String   monaide="help/Help110.png";
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(actions: <Widget>[
-          Expanded(
-              child: Row(
-                  children: [
-                    ElevatedButton(
-                        onPressed: () => {Navigator.pop(context)},
+          Row(
+              children: [
+                ElevatedButton(
+                    onPressed: () => {Navigator.pop(context)},
 
-                        child: const Text('Exit')),
-                  ]))
+                    child: const Text('Exit')),
+              ])
         ]),
 
         body:
-        Column(children: <Widget>[
-          Container(
-            alignment: Alignment.center,
-            child: Image.network(
-                monaide
-            ),
+        Container(
+          height: 500,
+          constraints:
+          BoxConstraints(minHeight: MediaQuery.of(context).size.height
+            //set minimum height equal to 100% of VH
           ),
-
-        ]),
+          width: MediaQuery.of(context).size.width,
+          alignment: Alignment.center,
+          child: Image.network(
+              monaide
+          ),
+        ),
 
 
         bottomNavigationBar: Row(children: [
@@ -103,16 +105,16 @@ prevPRL() {
     cestCeluiLa--;
     if (cestCeluiLa < 1) cestCeluiLa = 1;
     repaintPRL = true;
-    int nu=10*  cestCeluiLa+100;
-    monaide ="help/Help"+nu.toString()+".png";
+
+    monaide ="help/Help"+cestCeluiLa.toString()+".jpeg";
   });
 }
   nextPRL() {
     setState(() {
      cestCeluiLa++;
-      if (cestCeluiLa >9 ) cestCeluiLa =9;
-      int nu=10*  cestCeluiLa+100;
-  monaide ="help/Help"+nu.toString()+".png";
+      if (cestCeluiLa >7 ) cestCeluiLa =1;
+
+  monaide ="help/Help"+cestCeluiLa.toString()+".jpeg";
 
     });
   }

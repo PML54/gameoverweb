@@ -419,12 +419,6 @@ class _GameManagerState extends State<GameManager> {
       PhlCommons.nbFotosGame = 0;
       PhlCommons.nbGamersGame = 0;
 
-      /*
-      getGmGames();
-      dispNbFotosGame = PhlCommons.nbFotosGame.toString();
-      genCodeGame();
-      PhlCommons.thisGameCode=thatGameCode;
-*/
     });
   }
 
@@ -500,7 +494,7 @@ class _GameManagerState extends State<GameManager> {
     createGameState = false;
     createGameError = -1;
 // onforce status à Zero
-    int _forceStatus=0;
+    int _forceStatus=1;  // <PHL> Request
     var data = {
       "GAMECODE": PhlCommons.gameActif.gamecode.toString(),
       "GAMEMODE": PhlCommons.gameActif.gamemode.toString(),
@@ -533,9 +527,15 @@ class _GameManagerState extends State<GameManager> {
         createGameError = 0;
         listGmGames = datamysql.map((xJson) => Games.fromJson(xJson)).toList();
         createGameState = true;
+
+        // On vient de creer UN GAME
+        // ON lindique à l'appelant
+
+        PhlCommons.gameNew=1;
       });
     } else {}
     //  getGmGames();
+
   }
 
   Future overSelectGamersPhl() async {

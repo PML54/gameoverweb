@@ -19,7 +19,7 @@ class GameUser extends StatefulWidget {
 
 class _GameUserState extends State<GameUser> {
   GameCommons myPerso = GameCommons("xxxx", 0, 0);
-  bool _validateKBD = false;
+
   bool myBool = false;
   bool feuOrange = true;
   List<Games> myGuGame = []; //  only one Games
@@ -198,13 +198,14 @@ class _GameUserState extends State<GameUser> {
   Future createMeme() async {
     Uri url = Uri.parse(pathPHP + "createMEME.php");
     for (PhotoBase _brocky in listPhotoBase) {
+
       var data = {
         "PHOTOID": _brocky.photoid.toString(),
         "GAMECODE": PhlCommons.thisGameCode.toString(),
         "UID": PhlCommons.thatUid.toString(),
         "MEMETEXT": _brocky.memetempo,
       };
-print (" _brocky.memetempo.l"+_brocky.memetempo );
+
       if (_brocky.memetempo.length > 1) {
         await http.post(url, body: data);
       }

@@ -1,7 +1,7 @@
 // FAVORI
 // 5 Juillet
 //  Lire  les Favoris et in les Note
-import 'dart:async';
+
 import 'dart:convert';
 import 'dart:core';
 
@@ -248,7 +248,7 @@ class _MemolikeState extends State<Memolike> {
       updateThisMli(listMemoLike[cestCeluiLa].memolikeid);
       thatAverage =
           (updateThisMli(listMemoLike[cestCeluiLa].memolikeid)).toDouble();
-      print (" Sotie  N°2  de GetMLVU");
+
 
 
     });
@@ -265,7 +265,7 @@ class _MemolikeState extends State<Memolike> {
   Future getMLVU() async {
     Uri url = Uri.parse(pathPHP + "getMLV.php");
     listCheckMlvuState = false;
-print (" Get MlVU AVAT");
+
     http.Response response = await http.post(url);
     if (response.body.toString() == 'ERR_1001') {}
     if (response.statusCode == 200 && (getMemolikeError != 1001)) {
@@ -274,7 +274,7 @@ print (" Get MlVU AVAT");
         listCheckMlvu =
             datamysql.map((xJson) => CheckMLVU.fromJson(xJson)).toList();
         listCheckMlvuState = true;
-        print (" Get MlVU APREST");
+
       });
     } else {}
   }
@@ -299,10 +299,10 @@ print (" Get MlVU AVAT");
         }
       }
     });
-
+/*
     Timer.periodic(Duration(seconds: 100), (timer) {
       print(DateTime.now());
-    });
+    });*/
   }
 
   nextPRL() {
@@ -324,8 +324,7 @@ print (" Get MlVU AVAT");
   pressEmoticone(int _myUid, int lequel) {
     if (_myUid==0) _myUid=999;
     setState(() {
-      print ("_myUid "+ _myUid.toString());
-      print ("lequel "+ lequel.toString());
+
       createMemolikeVote(_myUid, lequel);
     });
   }
@@ -359,10 +358,10 @@ print (" Get MlVU AVAT");
         listMemoLike =
             datamysql.map((xJson) => MemoLike.fromJson(xJson)).toList();
 
-        print (" Apres readMEMOLIKE.php");
+
         readMemolikeState = true;
         readMemolikeVote();
-        print (" Après readMemolikeVote()");
+
       });
     } else {}
   }
@@ -380,7 +379,7 @@ print (" Get MlVU AVAT");
       readMemolikeVoteError = 1000; //Not Found
       readMemolikeVoteState = true; // Vide Mais corect
 
-      print ("ERRR_1000");
+
     }
      if (res.statusCode == 200 && (readMemolikeVoteError != 1000)) {
       var datamysql = jsonDecode(res.body) as List;

@@ -10,7 +10,8 @@ import 'package:gameover/gameuser.dart';
 import 'package:gameover/gamevote.dart';
 import 'package:gameover/gamevoteresult.dart';
 import 'package:gameover/phlcommons.dart';
-
+import 'package:gameover/gamemanager.dart';
+import 'package:gameover/gamehelp.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 
@@ -97,6 +98,7 @@ class _GameSupervisorState extends State<GameSupervisor> {
                       changeStateGameUser(0);
 
                       Navigator.pop(context);
+
                     }),
                 ElevatedButton(
                     onPressed: () => {null},
@@ -109,6 +111,28 @@ class _GameSupervisorState extends State<GameSupervisor> {
                             backgroundColor: Colors.blue,
                             fontWeight: FontWeight.bold)),
                     child: Text(myPerso.myPseudo)),
+                ElevatedButton(
+                    onPressed: () {
+                    //  _timer?.cancel();
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => GameManager(),
+                          settings: RouteSettings(
+                            arguments: myPerso,
+                          ),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                        primary: Colors.blue,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 5),
+                        textStyle: TextStyle(
+                            fontSize: 14,
+                            backgroundColor: Colors.blue,
+                            fontWeight: FontWeight.bold)),
+                    child: Text("New GAME")),
               ],
             ),
           ),
@@ -205,6 +229,23 @@ class _GameSupervisorState extends State<GameSupervisor> {
                   );
                 },
               ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.help_center),
+              iconSize: 35,
+              color: Colors.green,
+              tooltip: 'Aide',
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => GameHelp(),
+                    settings: RouteSettings(
+                      arguments: myPerso,
+                    ),
+                  ),
+                );
+              },
             ),
           ],
         ),
@@ -343,7 +384,11 @@ class _GameSupervisorState extends State<GameSupervisor> {
   }
 
   Expanded getListGame() {
-    // getGamebyUid();
+   if (PhlCommons.gameNew == 1){
+     PhlCommons.gameNew =0;
+     getGamebyUid();
+
+    }
     if (!getGamebyUidState) {
       return (const Expanded(child: Text(".............")));
     }
@@ -431,7 +476,7 @@ class _GameSupervisorState extends State<GameSupervisor> {
 
   Expanded getListGameUsers() {
     if (!getGameUsersByCodeState) {
-      print(" Error getGameUsersByCodeState ");
+
 
       return (const Expanded(child: Text(".............")));
     }
@@ -472,7 +517,7 @@ class _GameSupervisorState extends State<GameSupervisor> {
                                 fontSize:
                                     (Gamers[index].uprofile == 5) ? 14 : 14)),
                         onPressed: () {
-                          print(Gamers[index].gustate);
+
                         },
                       ),
                     ],
@@ -489,17 +534,14 @@ class _GameSupervisorState extends State<GameSupervisor> {
   @override
   void initState() {
     super.initState();
-
     getGamebyUid(); //     myGames
-
-    SetGuOffGames();
+    setGuOffGames();
     getGameUsersByCode(); //  Gamers =
-
     _timer = Timer.periodic(Duration(seconds: 2), (timer) {
       setState(() {
         greeting = "Check ${DateTime.now().second}";
         checkAudika();
-        //getGamebyUidState();
+
         plusGamebyUid(); //   update S tatus   myGames
         if (getGameUsersByCodeState) plusGamers(); //  Gamers
       });
@@ -509,7 +551,7 @@ class _GameSupervisorState extends State<GameSupervisor> {
   Future plusGamebyUid() async {
     bool gameUidFound = true;
     plusGamebyUidState = false;
-    if (PhlCommons.thatUid == null) return;
+    if (PhlCommons.thatUid == 0) return;
     Uri url = Uri.parse(pathPHP + "plusGAMEBYUID.php");
     var data = {
       "UID": PhlCommons.thatUid.toString(),
@@ -550,7 +592,7 @@ class _GameSupervisorState extends State<GameSupervisor> {
   Future plusGamers() async {
     bool gameCodeFound = true;
     plusGamersState = false;
-    if (PhlCommons.thatUid == null) return;
+    if (PhlCommons.thatUid == 0) return;
     Uri url = Uri.parse(pathPHP + "plusreadGAMEUSERSBYCODE.php");
     var data = {
       "GAMECODE": PhlCommons.thisGameCode.toString(),
@@ -588,16 +630,7 @@ class _GameSupervisorState extends State<GameSupervisor> {
   }
 
   Future promoteGame() async {
-    /*
-    Attente du départ	0
-Caption  en cours	1
-Fin des Captions	2
-Vote en cours	3
-Fin des Votes	4
-Résultats	5
-Aborted	6
-     */
-    promoteGameState = false;
+     promoteGameState = false;
     int _status = myGames[cestCeluiLa].gamestatus;
     _status = _status + 1;
     if (_status == 6) _status = 0;
@@ -607,7 +640,7 @@ Aborted	6
       myGames[cestCeluiLa].gamestatus = _status;
       PhlCommons.gameStatus = _status;
  */
-    print(" Promote");
+
     Uri url = Uri.parse(pathPHP + "promoteGAME.php");
     var data = {
       "GAMECODE": PhlCommons.thisGameCode.toString(),
@@ -625,7 +658,7 @@ Aborted	6
     } else {}
   }
 
-  Future SetGuOffGames() async {
+  Future setGuOffGames() async {
     Uri url = Uri.parse(pathPHP + "setGUOFFGAME.php");
     var data = {
       "UID": PhlCommons.thatUid.toString(),

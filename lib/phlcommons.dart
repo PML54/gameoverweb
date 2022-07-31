@@ -16,6 +16,8 @@ class PhlCommons {
   static int thatStatus=0;
   static int gameStatus=0;
   static int thatState=0;
+  static int random=1; // Normal 2 = Films<PHL>
+  static int gameNew=0;
   PhlCommons(this.numiro);
 
   static Games gameActif = Games(

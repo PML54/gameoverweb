@@ -12,7 +12,7 @@
 // MEMETEXT | varchar(50) | YES  |     | NULL    |                |
 //listMemoLike[cestCeluiLa].photofilename +
 //listMemoLike[cestCeluiLa].photofiletype,
-import 'dart:async';
+
 import 'dart:convert';
 import 'dart:core';
 
@@ -48,7 +48,7 @@ class _GameVoteResultState extends State<GameVoteResult> {
   bool booLike = false;
   final now = DateTime.now();
   late int myUid;
-
+String ordinal ="ème";
   @override
   Widget build(BuildContext context) {
     final myPerso = ModalRoute.of(context)!.settings.arguments as GameCommons;
@@ -109,12 +109,20 @@ class _GameVoteResultState extends State<GameVoteResult> {
                     ),
                   ),
                   Center(
-                      child: Text('By ' + listGameLike[cestCeluiLa].uid.toString()
-                           +
-                          '--> ' +
-                          listGameLike[cestCeluiLa].mynote.toString() +
-                          " Points",
-                          style: const TextStyle(fontSize: 22, color: Colors.red),
+                      child:
+                      Row(
+                        children: [
+                          listGameLike.length-cestCeluiLa <4 ? Text (medals[listGameLike.length-cestCeluiLa],    style: const TextStyle(fontSize: 45, color: Colors.black ), )
+                          : Text (''),
+
+                          Text( "Le Meme de " +listGameLike[cestCeluiLa].uname
+                               +
+                              ' est ' +   (listGameLike.length-cestCeluiLa).toString()+   ordinal+" sur "+listGameLike.length.toString()+ ' avec '+
+                              listGameLike[cestCeluiLa].mynote.toString() +
+                              " Points !",
+                              style: const TextStyle(fontSize: 16, color: Colors.black, fontStyle:FontStyle.italic),
+                          ),
+                        ],
                       )),
                 ]),
               )
@@ -158,10 +166,12 @@ class _GameVoteResultState extends State<GameVoteResult> {
         }
       }
     });
-
+/*
     Timer.periodic(Duration(seconds: 100), (timer) {
       print(DateTime.now());
-    });
+    }
+
+    );*/
   }
 
   nextPRL() {
@@ -170,6 +180,9 @@ class _GameVoteResultState extends State<GameVoteResult> {
       if (cestCeluiLa >= listGameLike.length) {
         cestCeluiLa = listGameLike.length - 1;
       }
+      if (cestCeluiLa== listGameLike.length - 1)   {
+        ordinal="er";} else { ordinal="ème";}
+
       repaintPRL = true;
     });
   }
@@ -178,6 +191,8 @@ class _GameVoteResultState extends State<GameVoteResult> {
     setState(() {
       cestCeluiLa--;
       if (cestCeluiLa < 0) cestCeluiLa = 0;
+      if (cestCeluiLa== listGameLike.length - 1)   {
+        ordinal="er";} else { ordinal="ème";}
       repaintPRL = true;
     });
   }
@@ -231,8 +246,8 @@ class _GameVoteResultState extends State<GameVoteResult> {
             }
           }
         }
-       listGameLike.sort((a, b) => b.mynote.compareTo(a.mynote));
+       listGameLike.sort((a, b) =>a.mynote.compareTo(b.mynote));
       });
     } else {}
-  }
+  }// /u20224
 }

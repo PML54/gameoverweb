@@ -39,8 +39,6 @@ class _GameVoteState extends State<GameVote> {
   int readGameLikeError = 0;
   int getGameVoteError = 0;
   List<GameLike> listGameLike = [];
-  bool readGameVoteState = false;
-  bool readGameVoteVoteState = false;
 
   bool readGameLikeVoteState = false;
   List<int> listCountEmo = [];
@@ -115,11 +113,7 @@ class _GameVoteState extends State<GameVote> {
             child: Row(
               children: [
                 ElevatedButton(
-                    onPressed: () => {
-        //  changeStatusGameUser(8);
-          cleanExit()
-                      },
-
+                    onPressed: () => {cleanExit()},
                     style: ElevatedButton.styleFrom(
                         primary: Colors.red,
                         padding: const EdgeInsets.symmetric(
@@ -276,9 +270,9 @@ class _GameVoteState extends State<GameVote> {
                           ],
                         )
                       : const Text('...'),
-                  Center(
-                      child: Text(
-                          'By ' + listGameLike[cestCeluiLa].uid.toString())),
+                /*Center(
+                      child:
+                      Text('By ' + listGameLike[cestCeluiLa].uid.toString())),*/
                 ]),
               )
             : const Text(''),
@@ -287,7 +281,7 @@ class _GameVoteState extends State<GameVote> {
               icon: const Icon(Icons.arrow_back),
               iconSize: 35,
               color: Colors.blue,
-              tooltip: 'Prev',
+              tooltip: 'Précédent',
               onPressed: () {
                 prevPRL();
               }),
@@ -303,7 +297,6 @@ class _GameVoteState extends State<GameVote> {
               onPressed: () {
                 nextPRL();
               }),
-
         ]),
       ),
     );
@@ -322,26 +315,25 @@ class _GameVoteState extends State<GameVote> {
   }
 
   Future changeStatusGameUser(int _status) async {
-    // STATUS ONLINE/OFFINE =BIT 1 on
-    // 2 MEMING
-    // 4 MEMECLOSED
-    // 8  VOTING
-    // 16 VOTECLOSED
     Uri url = Uri.parse(pathPHP + "changeStatusGameUser.php");
     changeStatusGameUserState = false;
     var data = {
       "GAMECODE": PhlCommons.thisGameCode.toString(),
       "UID": PhlCommons.thatUid.toString(),
-
       "GUSTATUS": (_status).toString(),
     };
     await http.post(url, body: data);
     changeStatusGameUserState = true;
   }
 
+  void cleanExit() {
+    changeStatusGameUser(4); //Voting
+    stopTimer();
+    Navigator.pop(context);
+  }
+
   Future createGameVote(int _myUid, int _points) async {
     Uri url = Uri.parse(pathPHP + "createGameVote.php");
-
     var data = {
       "GAMECODE": PhlCommons.thisGameCode.toString(),
       "GVPOINTS": _points.toString(),
@@ -350,12 +342,9 @@ class _GameVoteState extends State<GameVote> {
       "UID": _myUid.toString()
     };
     var res = await http.post(url, body: data);
-    //var datamysql = jsonDecode(res.body) as List;
-    setState(() {});
   }
 
   Future createGameVoteAll(int _myUid) async {
-
     Uri url = Uri.parse(pathPHP + "createGameVoteAll.php");
 
     for (GameLike _thisVote in listGameLike) {
@@ -393,9 +382,7 @@ class _GameVoteState extends State<GameVote> {
         getGamebyCodeError = 0;
         // On le met à  la source
         timerVoteGame = myGuGame[0].gametimevote;
-
         countdownDuration = Duration(seconds: timerVoteGame);
-
       });
     } else {}
   }
@@ -413,10 +400,8 @@ class _GameVoteState extends State<GameVote> {
     cestCeluiLa = 0;
     getIP();
     readGameLike(); // Seule Lecture  GameLike
-
     getGamebyCode(); // H-eu
     changeStatusGameUser(3); //Voting
-
     listCountEmo.clear();
     for (int i = 0; i < 6; i++) {
       listCountEmo.add(0);
@@ -429,10 +414,6 @@ class _GameVoteState extends State<GameVote> {
           repaintPRL = true;
         }
       }
-    });
-
-    Timer.periodic(Duration(seconds: 100), (timer) {
-      print(DateTime.now());
     });
   }
 
@@ -447,8 +428,6 @@ class _GameVoteState extends State<GameVote> {
   }
 
   pressEmoticone(int _myUid, int lequel) {
-
-
     if (listGameLike[cestCeluiLa].uid == _myUid) return;
     setState(() {
       if (listGameLike[cestCeluiLa].mynote == lequel) {
@@ -475,7 +454,6 @@ class _GameVoteState extends State<GameVote> {
     var data = {
       "GAMECODE": PhlCommons.thisGameCode.toString(),
     };
-
     http.Response response = await http.post(url, body: data);
     if (response.body.toString() == 'ERR_1001') {
       readGameLikeError = 1001; //Not Found
@@ -491,21 +469,9 @@ class _GameVoteState extends State<GameVote> {
     } else {}
   }
 
-  Future readGameVote() async {
-    Uri url = Uri.parse(pathPHP + "readGameVote.php");
-
-    http.Response response = await http.post(url);
-    if (response.body.toString() == 'ERR_1001') {}
-    if (response.statusCode == 200 && (readGameLikeError != 1001)) {
-      var datamysql = jsonDecode(response.body) as List;
-      setState(() {});
-    } else {}
-  }
-
   void reset() {
     if (countDown) {
       setState(() => duration = countdownDuration);
-
     } else {
       setState(() => duration = const Duration());
     }
@@ -520,11 +486,5 @@ class _GameVoteState extends State<GameVote> {
       reset();
     }
     setState(() => timer?.cancel());
-  }
-  void cleanExit()
-  {
-    changeStatusGameUser(4); //Voting
-    stopTimer();
-    Navigator.pop(context);
   }
 }

@@ -31,3 +31,9 @@ List msgNewGame = ["Nom Game ?", "Photos Selected ? "];
 List statusUser = ["DISABLED", "ENABLED"];
 Color colorOK = Colors.green;
 Color colorKO = Colors.red;
+//String medalGold=""🥇 🥈 🥉";
+List medals=[ "🥇","🥇" ,"🥈","🥉"];
+String medalGold="🥇";
+String medalSilver="🥈";
+String medalBronze="🥉";
+

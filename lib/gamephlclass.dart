@@ -208,6 +208,7 @@ class GameLike {
   String photofiletype = "TTT";
   String memetext = "FFFF";
   int mynote = 0;
+  String uname="XX";
 
   GameLike(
       {required this.memeid,
@@ -216,7 +217,9 @@ class GameLike {
       required this.gamecode,
       required this.photofilename,
       required this.photofiletype,
-      required this.memetext});
+      required this.memetext,
+        required this.uname
+      });
 
   factory GameLike.fromJson(Map<String, dynamic> json) {
     return GameLike(
@@ -227,6 +230,7 @@ class GameLike {
       photofilename: json['PHOTOFILENAME'] as String,
       photofiletype: json['PHOTOFILETYPE'] as String,
       memetext: json['MEMETEXT'] as String,
+      uname: json['UNAME'] as String,
     );
   }
 }
