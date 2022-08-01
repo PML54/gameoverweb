@@ -154,13 +154,22 @@ class _AdminPhotosState extends State<AdminPhotos> {
           children: [
             Container(
               alignment: Alignment.center,
-              child: Image.network(
-                "upload/" +
-                    listPhotoBaseWork[cestCeluiLa].photofilename +
-                    "." +
-                    listPhotoBaseWork[cestCeluiLa].photofiletype,
-              ),
+              child:
+              Stack(
+
+                children:[ Image.network(
+                  "upload/" +
+                      listPhotoBaseWork[cestCeluiLa].photofilename +
+                      "." +
+                      listPhotoBaseWork[cestCeluiLa].photofiletype,
+                ),
+          Align(
+
+  alignment: Alignment.topRight,              child: Text ("lamemopole.com")),
+
+            ]
             ),
+            )
           ],
         )));
   }

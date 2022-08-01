@@ -209,7 +209,7 @@ class _GameSupervisorState extends State<GameSupervisor> {
               ),
             ),
             Visibility(
-              visible: PhlCommons.gameStatus == 3 && PhlCommons.thatStatus == 2,
+              visible: PhlCommons.gameStatus == 3 && PhlCommons.thatStatus <3,
               child: ElevatedButton(
                 child: Text(
                   " Votez ",
@@ -410,7 +410,7 @@ class _GameSupervisorState extends State<GameSupervisor> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(myGames[index].gamecode.toString(),
+                       Text(myGames[index].gamecode.toString(),
                                 style: TextStyle(
                                     color: Colors.white, fontSize: 16))
                           ],

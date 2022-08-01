@@ -25,7 +25,9 @@ class  _SuperCatRandomState extends State<SuperCatRandom> {
   int totalSeconds = 100;
   bool timeOut = false;
   bool boolOptions = true;
-
+  int heightFoto=1;
+  int widthFoto=1;
+  double ratioFoto=1.0;
   bool boolCategory = false;
   bool boolDisplay = true;
   int getPhotoCatError = -1;
@@ -106,6 +108,7 @@ class  _SuperCatRandomState extends State<SuperCatRandom> {
                       lockPhoto();
                     },
                   ),
+                  Text(nbPhotoRandom.toString()),
                   Visibility(
                     visible: visStar,
                     child: IconButton(
@@ -128,7 +131,9 @@ class  _SuperCatRandomState extends State<SuperCatRandom> {
                       //
                     },
                   ),
-                  Text(nbPhotoRandom.toString()),
+
+                  Text(" <"+ widthFoto.toString()+"/"+heightFoto.toString() + '  '+ratioFoto.toStringAsPrecision(2)+">"),
+
 
                 ],
               ),
@@ -175,25 +180,10 @@ class  _SuperCatRandomState extends State<SuperCatRandom> {
                   color: Colors.red,
                   tooltip: 'Photo Random',
                   onPressed: () {
-                    setState(() {
-                      int random = Random().nextInt(nbPhotoRandom); //Suppe 1
-                      int randomMeme = Random().nextInt(listMemoto.length);
-                      photoIdRandom = photoidSelected[random];
-                      boolCategory = false;
-                      if (!lockPhotoState) {
-                        cestCeluiLa = getIndexFromPhotoId(photoIdRandom);
-                      }
-                      if (!lockMemeState) {
-                        memeLegende = listMemoto[randomMeme].memostock;
-                      }
-                      memoStockidRandom = listMemoto[randomMeme].memostockid;
-                      legendeController.text = memeLegendeUser;
-                      legendeController.text = memeLegende;
-                      visStar = true;
-                      //legendeController.text =""; // Test
-                      savePRL(); // Ajout pour toutes
-                    });
-                  }),
+       randomMarteau();
+                  }
+
+                  ),
               IconButton(
                   icon: const Icon(Icons.arrow_back),
                   iconSize: 30,
@@ -276,6 +266,7 @@ class  _SuperCatRandomState extends State<SuperCatRandom> {
       legendeController.text = memeLegendeUser;
       legendeController.text = memeLegende;
       visStar = true;
+
     });
   }
 
@@ -296,6 +287,7 @@ class  _SuperCatRandomState extends State<SuperCatRandom> {
         legendeController.text = ""; // Test
         //cestCeluiLa =thatPRL;
         repaintPRL = false;
+
       }
     });
     return Expanded(
@@ -387,28 +379,10 @@ class  _SuperCatRandomState extends State<SuperCatRandom> {
                         child:
                         Text('    Random Meme        '),
                         onPressed: () {
-                          setState(() {
-                            int random =
-                            Random().nextInt(nbPhotoRandom); //Suppe 1
-                            int randomMeme = Random().nextInt(listMemoto.length);
+                          randomMarteau();
+                        }
 
-                            photoIdRandom = photoidSelected[random];
-                            boolCategory = false;
-                            if (!lockPhotoState) {
-                              cestCeluiLa = getIndexFromPhotoId(photoIdRandom);
-                            }
-                            if (!lockMemeState) {
-                              memeLegende = listMemoto[randomMeme].memostock;
-                            }
-                            memoStockidRandom =
-                                listMemoto[randomMeme].memostockid;
-                            legendeController.text = memeLegendeUser;
-                            legendeController.text = memeLegende;
-                            visStar = true;
-                            //legendeController.text =""; // Test
-                            savePRL(); // Ajout pour toutes
-                          });
-                        }),
+                        ),
                     IconButton(
                         icon: const Icon(Icons.gavel),
                         iconSize: 30,
@@ -416,25 +390,11 @@ class  _SuperCatRandomState extends State<SuperCatRandom> {
 
                         tooltip: 'Photo Random',
                         onPressed: () {
-                          setState(() {
-                            int random = Random().nextInt(nbPhotoRandom); //Suppe 1
-                            int randomMeme = Random().nextInt(listMemoto.length);
-                            photoIdRandom = photoidSelected[random];
-                            boolCategory = false;
-                            if (!lockPhotoState) {
-                              cestCeluiLa = getIndexFromPhotoId(photoIdRandom);
-                            }
-                            if (!lockMemeState) {
-                              memeLegende = listMemoto[randomMeme].memostock;
-                            }
-                            memoStockidRandom = listMemoto[randomMeme].memostockid;
-                            legendeController.text = memeLegendeUser;
-                            legendeController.text = memeLegende;
-                            visStar = true;
-                            //legendeController.text =""; // Test
-                            savePRL(); // Ajout pour toutes
-                          });
-                        }),
+                          randomMarteau();
+                        }
+
+
+                        ),
 
                   ],
                 ),
@@ -449,7 +409,7 @@ class  _SuperCatRandomState extends State<SuperCatRandom> {
                                 fontSize: 14,
                                 backgroundColor: Colors.green,
                                 fontWeight: FontWeight.bold)),
-                        child: Text('Category Filter: '),
+                        child: Text('Category Filter:'),
                         onPressed: () {
                           setState(() {
                             boolCategory = !boolCategory;
@@ -469,7 +429,7 @@ class  _SuperCatRandomState extends State<SuperCatRandom> {
                             boolTexfield = false; // <PML>  a verifier
                           });
                         }),
-                    SizedBox( width:50, height: 50 ),
+                    SizedBox( width:10, height: 30 ),
                     ElevatedButton(
                         style: ElevatedButton.styleFrom(
                             primary: Colors.blue,
@@ -511,7 +471,7 @@ class  _SuperCatRandomState extends State<SuperCatRandom> {
                               fontSize: 14,
                               backgroundColor: Colors.black,
                               fontWeight: FontWeight.bold)),
-                      child: Text('Caption Lock:   '),
+                      child: Text('Caption Lock:  '),
                       onPressed: () {
                         lockMeme();
                       },
@@ -525,7 +485,7 @@ class  _SuperCatRandomState extends State<SuperCatRandom> {
                         lockMeme();
                       },
                     ),
-                    SizedBox( width:50, height: 50 ),
+                    SizedBox( width:10, height: 30 ),
                     ElevatedButton(
                         style: ElevatedButton.styleFrom(
                             primary: Colors.black,
@@ -879,5 +839,36 @@ String _postsupercode="NORMAL"; // Modfif <PHL>
       boolTexfield = false;
       thatPRL++;
     });
+  }
+  randomMarteau () {
+
+    setState(() {
+      int random =
+      Random().nextInt(nbPhotoRandom); //Suppe 1
+      int randomMeme = Random().nextInt(listMemoto.length);
+
+      photoIdRandom = photoidSelected[random];
+      boolCategory = false;
+      if (!lockPhotoState) {
+        cestCeluiLa = getIndexFromPhotoId(photoIdRandom);
+      }
+      if (!lockMemeState) {
+        memeLegende = listMemoto[randomMeme].memostock;
+      }
+      memoStockidRandom =
+          listMemoto[randomMeme].memostockid;
+      legendeController.text = memeLegendeUser;
+      legendeController.text = memeLegende;
+      visStar = true;
+
+      heightFoto=listPhotoBase[cestCeluiLa].photoheight;
+      widthFoto=listPhotoBase[cestCeluiLa].photowidth;
+      ratioFoto=widthFoto/heightFoto;
+
+
+      //legendeController.text =""; // Test
+      savePRL(); // Ajout pour toutes
+    });
+
   }
 }
