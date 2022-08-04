@@ -409,25 +409,47 @@ class GameVotes {
     );
   }
 }
-class GameVotesResult {
+class GameVotesResultMeme {
   int memeid = 0;
   int gamecode = 0;
   int sumg = 0;
 
-  GameVotesResult({
+  GameVotesResultMeme({
     required this.memeid,
     required this.gamecode,
     required this.sumg,
   });
 
-  factory GameVotesResult.fromJson(Map<String, dynamic> json) {
-    return GameVotesResult(
+  factory GameVotesResultMeme.fromJson(Map<String, dynamic> json) {
+    return GameVotesResultMeme(
       memeid: int.parse(json['MEMEID']),
       gamecode: int.parse(json['GAMECODE']),
       sumg: int.parse(json['SUMG']),
     );
   }
 }
+
+
+class GameVotesResultUid {
+  int uid = 0;
+  int gamecode = 0;
+  int sumg = 0;
+
+  GameVotesResultUid({
+    required this.uid,
+    required this.gamecode,
+    required this.sumg,
+  });
+
+  factory GameVotesResultUid.fromJson(Map<String, dynamic> json) {
+    return GameVotesResultUid(
+      uid: int.parse(json['UID']),
+      gamecode: int.parse(json['GAMECODE']),
+      sumg: int.parse(json['SUMG']),
+    );
+  }
+}
+
 
 class Memes {
   int memeid = 0;

@@ -10,13 +10,16 @@ import 'package:gameover/configgamephl.dart';
 import 'package:gameover/gamephlclass.dart';
 import 'package:gameover/mementoes.dart';
 import 'package:gameover/memolike.dart';
+import 'package:gameover/sqlphl.dart';
 
 import 'package:gameover/supervisorgames.dart';
 import 'package:gameover/userconnect.dart';
 import 'package:gameover/usercreate.dart';
 import 'package:gameover/supercatrandom.dart';
 import 'package:gameover/admin/adminphotos.dart';
+import 'package:gameover/admin/adminmemotos.dart';
 
+import 'package:gameover/randomeme.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'phlcommons.dart';
@@ -36,6 +39,7 @@ void getParams() {
 
 class MenoPaul extends StatefulWidget {
   const MenoPaul({Key? key}) : super(key: key);
+
   @override
   State<MenoPaul> createState() => _MenoPaulState();
 }
@@ -65,7 +69,7 @@ class _MenoPaulState extends State<MenoPaul> {
     return Scaffold(
         appBar: AppBar(
           title: Text(
-            'lamemopole.com V010830 ' + myPerso.myPseudo,
+            'lamemopole.com V0804-1130 '+ myPerso.myPseudo,
             style: GoogleFonts.averageSans(fontSize: 15.0),
           ),
         ),
@@ -216,6 +220,35 @@ class _MenoPaulState extends State<MenoPaul> {
                     ),
                   ],
                 ),
+                Visibility(
+                  visible: isAdmin,
+                  child: Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: ElevatedButton(
+                          child: Text(
+                            '-->CLEAN CAPTIONS',
+                            style: GoogleFonts.averageSans(fontSize: 25.0),
+                          ),
+                          onPressed: () {
+                            setState(() {});
+
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => AdminMemotos(),
+                                settings: RouteSettings(
+                                  arguments: myPerso,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
                 Padding(
                   padding: const EdgeInsets.all(25.0),
                   child: Column(
@@ -289,6 +322,27 @@ class _MenoPaulState extends State<MenoPaul> {
                               ),
                             ),
                           ),
+                          Visibility(
+                            visible: isAdmin,
+                            child: Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: ElevatedButton(
+                                child: Text(
+                                  'Check DATA',
+                                  style:
+                                  GoogleFonts.averageSans(fontSize: 15.0),
+                                ),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                        const SqlPhl()),
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                       Row(
@@ -334,7 +388,7 @@ class _MenoPaulState extends State<MenoPaul> {
                               padding: const EdgeInsets.all(10.0),
                               child: ElevatedButton(
                                 child: Text(
-                                  'NEW GAMER',
+                                  'S’enregistrer',
                                   style: GoogleFonts.averageSans(
                                       fontSize: 15.0, color: Colors.black),
                                 ),
@@ -357,23 +411,30 @@ class _MenoPaulState extends State<MenoPaul> {
             ),
           ),
         ),
-        bottomNavigationBar: Visibility(
-          visible: boolMsg,
-          child: ElevatedButton(
-            onPressed: () {
-              setState(() {
-                boolMsg = false;
-              });
-            },
-            style: ElevatedButton.styleFrom(
-                primary: Colors.red,
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-                textStyle: const TextStyle(
-                    fontSize: 14,
-                    backgroundColor: Colors.red,
-                    fontWeight: FontWeight.bold)),
-            child: Text(errorMessage),
-          ),
+        bottomNavigationBar: Row(
+          children: [
+            Visibility(
+              visible: boolMsg,
+              child: ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    boolMsg = false;
+                  });
+                },
+                style: ElevatedButton.styleFrom(
+                    primary: Colors.red,
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                    textStyle: const TextStyle(
+                        fontSize: 14,
+                        backgroundColor: Colors.red,
+                        fontWeight: FontWeight.bold)),
+                child: Text(errorMessage),
+              ),
+            ),
+
+
+
+          ],
         ));
   }
 

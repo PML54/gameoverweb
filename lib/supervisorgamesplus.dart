@@ -21,14 +21,14 @@ import 'package:http/http.dart' as http;
 // Central Game
 // On va lire les Record Audika  Poufr
 // determiner ce ui'il est Juficieux de Lire
-class GameSupervisor extends StatefulWidget {
-  const GameSupervisor({Key? key}) : super(key: key);
+class GameSupervisorPlus extends StatefulWidget {
+  const GameSupervisorPlus({Key? key}) : super(key: key);
 
   @override
-  State<GameSupervisor> createState() => _GameSupervisorState();
+  State<GameSupervisorPlus> createState() => _GameSupervisorPlusState();
 }
 
-class _GameSupervisorState extends State<GameSupervisor> {
+class _GameSupervisorPlusState extends State<GameSupervisorPlus> {
   GameCommons myPerso = GameCommons("xxxx", 0, 0);
   GameAudika myAudikaGMU = GameAudika(
       audikaid: 0,
@@ -42,6 +42,19 @@ class _GameSupervisorState extends State<GameSupervisor> {
       lastid: 0,
       gamecode: 0,
       lastdate: DateTime.now().toString());
+
+
+
+  //  Booleéns Illusionq
+  //  Button New Game  le Jeu
+  // My Lobbies
+  // Quand  ouvre la page suls ces 2 buttons sont Visible
+
+  // New gamrn
+  // Booleann 2 Button
+  // Boolean My Lobbiies comme avant sans  creation de Jeu
+  // QUand je quiite My Lobbiers je reviens ux 2 buttons
+
   bool actionAudikaGMU = false; // Si
   bool actionAudikaGAME = false; // Si true Relire les GAMes
   bool boolContinue = false;
@@ -114,7 +127,7 @@ class _GameSupervisorState extends State<GameSupervisor> {
                     child: Text(myPerso.myPseudo)),
                 ElevatedButton(
                     onPressed: () {
-                    //  _timer?.cancel();
+                      //  _timer?.cancel();
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -177,8 +190,8 @@ class _GameSupervisorState extends State<GameSupervisor> {
                                   fontWeight: FontWeight.bold)),
                           child: Text("Passer au statut suivant"),
                           onPressed: () => {
-                                if (isGmid) {promoteGame()}
-                              }),
+                            if (isGmid) {promoteGame()}
+                          }),
 
 
                       getListGameUsers(),
@@ -410,9 +423,9 @@ class _GameSupervisorState extends State<GameSupervisor> {
   }
 
   Expanded getListGame() {
-   if (PhlCommons.gameNew == 1){
-     PhlCommons.gameNew =0;
-     getGamebyUid();
+    if (PhlCommons.gameNew == 1){
+      PhlCommons.gameNew =0;
+      getGamebyUid();
 
     }
     if (!getGamebyUidState) {
@@ -436,7 +449,7 @@ class _GameSupervisorState extends State<GameSupervisor> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                       Text(myGames[index].gamecode.toString(),
+                            Text(myGames[index].gamecode.toString(),
                                 style: TextStyle(
                                     color: Colors.white, fontSize: 16))
                           ],
@@ -541,7 +554,7 @@ class _GameSupervisorState extends State<GameSupervisor> {
                                     : Colors.black,
                                 // decoration:(Gamers[index].uprofile == 5) ? TextDecoration.underline :TextDecoration.none,
                                 fontSize:
-                                    (Gamers[index].uprofile == 5) ? 14 : 14)),
+                                (Gamers[index].uprofile == 5) ? 14 : 14)),
                         onPressed: () {
 
                         },
@@ -664,7 +677,7 @@ class _GameSupervisorState extends State<GameSupervisor> {
   }
 
   Future promoteGame() async {
-     promoteGameState = false;
+    promoteGameState = false;
     int _status = myGames[cestCeluiLa].gamestatus;
     _status = _status + 1;
     if (_status == 6) _status = 0;

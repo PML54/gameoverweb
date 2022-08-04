@@ -245,7 +245,7 @@ class _GameManagerState extends State<GameManager> {
                                   nbSecMeme.toString() +
                                   " s")),
                           //   Text( "Meming time = " + nbSecMeme.toString() + " s"),
-                          Slider(
+                        Slider(
                             label:
                                 'Temps total accordé pour légender TOUTES les photos choisies',
                             activeColor: Colors.orange,
@@ -255,7 +255,7 @@ class _GameManagerState extends State<GameManager> {
                             value: nbSecMeme,
                             onChanged: (double newValue) {
                               setState(() {
-                                //     dispNbFotosGame = PhlCommons.nbFotosGame.toString(); // <TODO>
+
                                 newValue = newValue.round() as double;
                                 if (newValue != nbSecMeme) nbSecMeme = newValue;
                               });
@@ -264,7 +264,7 @@ class _GameManagerState extends State<GameManager> {
                         ],
                       ),
                     ),
-                    Padding(
+             /*       Padding(
                       padding: const EdgeInsets.all(10.0),
                       child: Row(
                         children: [
@@ -298,7 +298,7 @@ class _GameManagerState extends State<GameManager> {
                           ),
                         ],
                       ),
-                    ),
+                    ),*/
                     Visibility(
                       visible: !isGameValidated,
                       child: Row(

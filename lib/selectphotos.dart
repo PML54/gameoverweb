@@ -339,7 +339,7 @@ class _SelectPhotosPhlState extends State<SelectPhotosPhl> {
           _thatid = _brocky.photoid;
         }
       }
-      _cathy.setSelected(1);
+      _cathy.setSelected(0);
       _cathy.setNumber(_nbcat);
       _cathy.setphotoid(_thatid);
       _cathy.supMM();

@@ -18,20 +18,21 @@ import 'dart:core';
 
 import 'package:flutter/material.dart';
 import 'package:gameover/configgamephl.dart';
+import 'package:gameover/gameVotePipole.dart';
 import 'package:gameover/gamephlclass.dart';
 import 'package:gameover/phlcommons.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 
 // Ici  On entre avec Un gamecode
-class GameVoteResult extends StatefulWidget {
-  const GameVoteResult({Key? key}) : super(key: key);
+class GameVoteResultPlus extends StatefulWidget {
+  const GameVoteResultPlus({Key? key}) : super(key: key);
 
   @override
-  State<GameVoteResult> createState() => _GameVoteResultState();
+  State<GameVoteResultPlus> createState() => _GameVoteResultPlusState();
 }
 
-class _GameVoteResultState extends State<GameVoteResult> {
+class _GameVoteResultPlusState extends State<GameVoteResultPlus> {
   TextEditingController legendeController = TextEditingController();
   String mafoto = 'assets/oursmacron.png';
   bool resultGameVoteState = false;
@@ -40,7 +41,7 @@ class _GameVoteResultState extends State<GameVoteResult> {
   int getGameVoteError = 0;
   List<GameLike> listGameLike = [];
   bool readGameLikeVoteState = false;
-  List<CheckVotePlus> listCheckVote = [];
+
   List<GameByUser> myGames = [];
   List<GameVotesResultMeme> listGameVotesResultMeme = [];
   int cestCeluiLa = 0;
@@ -48,7 +49,8 @@ class _GameVoteResultState extends State<GameVoteResult> {
   bool booLike = false;
   final now = DateTime.now();
   late int myUid;
-String ordinal ="ème";
+  String ordinal = "ème";
+
   @override
   Widget build(BuildContext context) {
     final myPerso = ModalRoute.of(context)!.settings.arguments as GameCommons;
@@ -70,26 +72,27 @@ String ordinal ="ème";
                             backgroundColor: Colors.red,
                             fontWeight: FontWeight.bold)),
                     child: const Text('Exit')),
-                Text(
-                  myPerso.myPseudo + " ",
-                  style: GoogleFonts.averageSans(fontSize: 18.0),
+
+                Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Text(
+                    myPerso.myPseudo + " ",
+                    style: GoogleFonts.averageSans(fontSize: 20.0),
+                  ),
                 ),
-                Text(PhlCommons.thisGameCode.toString()),
-                Visibility(
-                  visible: booLike,
-                  child: IconButton(
-                      icon: const Icon(Icons.sunny),
-                      iconSize: 35,
-                      color: Colors.yellowAccent,
-                      tooltip: 'Not Like',
-                      onPressed: () {
-                        // createMemeSolo();
-                      }),
-                ),
+                Text(PhlCommons.thisGameCode.toString() ,style: GoogleFonts.averageSans(fontSize: 20.0),),
+
+
+
               ],
             ),
           ),
         ]),
+
+
+
+
+
         body: readGameLikeState
             ? SafeArea(
                 child: Column(children: <Widget>[
@@ -109,21 +112,33 @@ String ordinal ="ème";
                     ),
                   ),
                   Center(
-                      child:
-                      Row(
-                        children: [
-                          listGameLike.length-cestCeluiLa <4 ? Text (medals[listGameLike.length-cestCeluiLa],    style: const TextStyle(fontSize: 45, color: Colors.black ), )
-                          : Text (''),
-
-                          Text( "Le Meme de " +listGameLike[cestCeluiLa].uname
-                               +
-                              ' est ' +   (listGameLike.length-cestCeluiLa).toString()+   ordinal+" sur "+listGameLike.length.toString()+ ' avec '+
-                              listGameLike[cestCeluiLa].mynote.toString() +
-                              " Points !",
-                              style: const TextStyle(fontSize: 16, color: Colors.black, fontStyle:FontStyle.italic),
-                          ),
-                        ],
-                      )),
+                      child: Row(
+                    children: [
+                      listGameLike.length - cestCeluiLa < 4
+                          ? Text(
+                              medals[listGameLike.length - cestCeluiLa],
+                              style: const TextStyle(
+                                  fontSize: 45, color: Colors.black),
+                            )
+                          : Text(''),
+                      Text(
+                        "Le Meme de " +
+                            listGameLike[cestCeluiLa].uname +
+                            ' est ' +
+                            (listGameLike.length - cestCeluiLa).toString() +
+                            ordinal +
+                            " sur " +
+                            listGameLike.length.toString() +
+                            ' avec ' +
+                            listGameLike[cestCeluiLa].mynote.toString() +
+                            " Points !",
+                        style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.black,
+                            fontStyle: FontStyle.italic),
+                      ),
+                    ],
+                  )),
                 ]),
               )
             : const Text(''),
@@ -148,6 +163,25 @@ String ordinal ="ème";
               onPressed: () {
                 nextPRL();
               }),
+          ElevatedButton(
+            child: Text(
+              " Best Candidates",
+              style: GoogleFonts.averageSans(fontSize: 16.0),
+            ),
+            onPressed: () {
+              //  PhlCommons.thisGameCode =  GameCode;
+
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>  GameVotePipol(),
+                  settings: RouteSettings(
+                    arguments: myPerso,
+                  ),
+                ),
+              );
+            },
+          ),
         ]),
       ),
     );
@@ -180,8 +214,11 @@ String ordinal ="ème";
       if (cestCeluiLa >= listGameLike.length) {
         cestCeluiLa = listGameLike.length - 1;
       }
-      if (cestCeluiLa== listGameLike.length - 1)   {
-        ordinal="er";} else { ordinal="ème";}
+      if (cestCeluiLa == listGameLike.length - 1) {
+        ordinal = "er";
+      } else {
+        ordinal = "ème";
+      }
 
       repaintPRL = true;
     });
@@ -191,8 +228,11 @@ String ordinal ="ème";
     setState(() {
       cestCeluiLa--;
       if (cestCeluiLa < 0) cestCeluiLa = 0;
-      if (cestCeluiLa== listGameLike.length - 1)   {
-        ordinal="er";} else { ordinal="ème";}
+      if (cestCeluiLa == listGameLike.length - 1) {
+        ordinal = "er";
+      } else {
+        ordinal = "ème";
+      }
       repaintPRL = true;
     });
   }
@@ -242,12 +282,11 @@ String ordinal ="ème";
           for (GameLike _gamelike in listGameLike) {
             if (_gamelike.memeid == _thisVote.memeid) {
               _gamelike.mynote = _thisVote.sumg;
-
             }
           }
         }
-       listGameLike.sort((a, b) =>a.mynote.compareTo(b.mynote));
+        listGameLike.sort((a, b) => a.mynote.compareTo(b.mynote));
       });
     } else {}
-  }// /u20224
+  } // /u20224
 }

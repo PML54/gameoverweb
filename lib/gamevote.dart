@@ -25,6 +25,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 
 // Ici  On entre avec Un gamecode
+
+// Le 3 Aout . J'ai Viré le Timer <PHL>
 class GameVote extends StatefulWidget {
   const GameVote({Key? key}) : super(key: key);
 
@@ -36,6 +38,7 @@ class _GameVoteState extends State<GameVote> {
   String ipv4name = "**.**.**";
 
   bool readGameLikeState = false;
+  bool createGameVoteState = false;
   int readGameLikeError = 0;
   int getGameVoteError = 0;
   List<GameLike> listGameLike = [];
@@ -50,62 +53,25 @@ class _GameVoteState extends State<GameVote> {
   bool repaintPRL = true;
 
   bool booLike = false;
-  bool feuOrange = true;
-  Color colorCounter = Colors.green;
+
   final now = DateTime.now();
 
   double thatAverage = 0;
   late int myUid;
-
   //
   bool changeStatusGameUserState = false;
   bool getGamebyCodeState = false;
   int getGamebyCodeError = 0;
   List<Games> myGuGame = []; //  only one Games`
-  //  Chrono
-  bool chronoStart = false;
+  //
   Duration countdownDuration = const Duration(seconds: 10000);
   int timerVoteGame = 0;
-
-  //Duration countdownDuration = Duration();
-  Duration duration = const Duration();
-  Timer? timer;
-  bool countDown = true;
-  int totalSeconds = 0;
-  bool timeOut = false;
-
-  void addTime() {
-    final addSeconds = countDown ? -1 : 1;
-    setState(() {
-      final seconds = duration.inSeconds + addSeconds;
-      if (seconds < 0) {
-        timer?.cancel();
-        timeOut = true;
-      } else {
-        duration = Duration(seconds: seconds);
-      }
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     final myPerso = ModalRoute.of(context)!.settings.arguments as GameCommons;
     myUid = myPerso.myUid;
-    if (!feuOrange && getGamebyCodeState) buildTime();
-    if (feuOrange && getGamebyCodeState) {
-      setState(() {
-        countDown = true;
-        countdownDuration = Duration(seconds: timerVoteGame);
-        duration = Duration(seconds: timerVoteGame);
-        reset();
 
-        startTimer();
-        chronoStart = true;
-        feuOrange = false;
-
-        //
-      });
-    }
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(actions: <Widget>[
@@ -135,26 +101,8 @@ class _GameVoteState extends State<GameVote> {
                             fontWeight: FontWeight.bold)),
                     child: Text(myPerso.myPseudo)),
                 Text(PhlCommons.thisGameCode.toString()),
-                Visibility(
-                  visible: booLike,
-                  child: IconButton(
-                      icon: const Icon(Icons.sunny),
-                      iconSize: 35,
-                      color: Colors.yellowAccent,
-                      tooltip: 'Not Like',
-                      onPressed: () {
-                        // createMemeSolo();
-                      }),
-                ),
-                Visibility(
-                  visible:
-                      chronoStart && getGamebyCodeState && totalSeconds < 9900,
-                  child: Text('->' + totalSeconds.toString() + 's',
-                      style: TextStyle(
-                          color:
-                              (totalSeconds < 10) ? Colors.red : Colors.white,
-                          fontSize: 18)),
-                ),
+                Text(" Vote ->" + createGameVoteState.toString()),
+
                 // Align(child: buildTime()),
               ],
             ),
@@ -163,7 +111,7 @@ class _GameVoteState extends State<GameVote> {
         body: readGameLikeState
             ? SafeArea(
                 child: Column(children: <Widget>[
-                  //Align(child: buildTime()),
+
                   Container(
                       alignment: Alignment.bottomLeft,
                       child: Text(
@@ -270,7 +218,7 @@ class _GameVoteState extends State<GameVote> {
                           ],
                         )
                       : const Text('...'),
-                /*Center(
+                  /*Center(
                       child:
                       Text('By ' + listGameLike[cestCeluiLa].uid.toString())),*/
                 ]),
@@ -302,18 +250,6 @@ class _GameVoteState extends State<GameVote> {
     );
   }
 
-  buildTime() {
-    setState(() {
-      totalSeconds = duration.inSeconds;
-      if (totalSeconds < 10) colorCounter = Colors.red;
-    });
-    if (totalSeconds <= 1) {
-      stopTimer();
-      changeStatusGameUser(4); //has Voted
-      Navigator.pop(context);
-    }
-  }
-
   Future changeStatusGameUser(int _status) async {
     Uri url = Uri.parse(pathPHP + "changeStatusGameUser.php");
     changeStatusGameUserState = false;
@@ -328,12 +264,16 @@ class _GameVoteState extends State<GameVote> {
 
   void cleanExit() {
     changeStatusGameUser(4); //Voting
-    stopTimer();
+
     Navigator.pop(context);
   }
 
   Future createGameVote(int _myUid, int _points) async {
     Uri url = Uri.parse(pathPHP + "createGameVote.php");
+    setState(() {
+      createGameVoteState = false;
+    });
+
     var data = {
       "GAMECODE": PhlCommons.thisGameCode.toString(),
       "GVPOINTS": _points.toString(),
@@ -342,20 +282,10 @@ class _GameVoteState extends State<GameVote> {
       "UID": _myUid.toString()
     };
     var res = await http.post(url, body: data);
-  }
-
-  Future createGameVoteAll(int _myUid) async {
-    Uri url = Uri.parse(pathPHP + "createGameVoteAll.php");
-
-    for (GameLike _thisVote in listGameLike) {
-      var data = {
-        "GAMECODE": PhlCommons.thisGameCode.toString(),
-        "MLVPOINTS": _thisVote.mynote.toString(),
-        "MLVDATE": now.toString(),
-        "MEMOLIKEID": _thisVote.memeid.toString(),
-        "UID": myUid.toString()
-      };
-      await http.post(url, body: data);
+    if (res.statusCode == 200) {
+      setState(() {
+        createGameVoteState = true;
+      });
     }
   }
 
@@ -406,7 +336,6 @@ class _GameVoteState extends State<GameVote> {
     for (int i = 0; i < 6; i++) {
       listCountEmo.add(0);
     }
-    reset();
 
     setState(() {
       if (readGameLikeState) {
@@ -467,24 +396,5 @@ class _GameVoteState extends State<GameVote> {
         readGameLikeState = true;
       });
     } else {}
-  }
-
-  void reset() {
-    if (countDown) {
-      setState(() => duration = countdownDuration);
-    } else {
-      setState(() => duration = const Duration());
-    }
-  }
-
-  void startTimer() {
-    timer = Timer.periodic(const Duration(seconds: 1), (_) => addTime());
-  }
-
-  void stopTimer({bool resets = true}) {
-    if (resets) {
-      reset();
-    }
-    setState(() => timer?.cancel());
   }
 }
