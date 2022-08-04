@@ -12,7 +12,7 @@
 // MEMETEXT | varchar(50) | YES  |     | NULL    |                |
 //listMemoLike[cestCeluiLa].photofilename +
 //listMemoLike[cestCeluiLa].photofiletype,
-import 'dart:async';
+
 import 'dart:convert';
 import 'dart:core';
 

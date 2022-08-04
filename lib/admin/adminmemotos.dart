@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:core';
 
-import 'package:dart_ipify/dart_ipify.dart';
+//import 'package:dart_ipify/dart_ipify.dart';
 import 'package:flutter/material.dart';
 import 'package:gameover/configgamephl.dart';
 import 'package:gameover/gamephlclass.dart';
@@ -220,7 +220,7 @@ class _AdminMemotosState extends State<AdminMemotos> {
 
   Future deleteMemoto() async {
     Uri url = Uri.parse(pathPHP + "deleteMEMOTO.php");
-    print ("ceMemoto"+ceMemoto.toString()) ;
+
     if (ceMemoto == 0) {
       return;
     }

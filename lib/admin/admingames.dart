@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:core';
 
-import 'package:dart_ipify/dart_ipify.dart';
+//import 'package:dart_ipify/dart_ipify.dart';
 import 'package:flutter/material.dart';
 import 'package:gameover/configgamephl.dart';
 import 'package:gameover/gamephlclass.dart';
@@ -94,7 +94,7 @@ class _AdminGamesState extends State<AdminGames> {
                             fontSize: 14,
                             backgroundColor: Colors.black,
                             fontWeight: FontWeight.bold)),
-                    child: Text("Sure to  Delete Caption   " + "??"),
+                    child: const Text("Sure to  Delete Caption   " "??"),
                   ),
                 ),
               ),
@@ -144,8 +144,8 @@ class _AdminGamesState extends State<AdminGames> {
         ),
       ]),
       body: SafeArea(
-        child: Column(children: <Widget>[
-          //  getViewMemotos(),
+        child: Column(children: const <Widget>[
+
         ]),
       ),
     ));

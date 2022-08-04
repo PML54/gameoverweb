@@ -1,4 +1,4 @@
-import 'dart:async';
+
 import 'dart:convert';
 import 'dart:core';
 
@@ -18,12 +18,13 @@ class SqlPhl extends StatefulWidget {
 }
 
 class _SqlPhlState extends State<SqlPhl> {
-  bool SendSqlState = false;
+  bool sendSqlState = false;
   bool myBool = false;
   bool feuOrange = true;
   bool readPmlCheckState = false;
   int readPmlCheckError = -1;
   String sqlCommand = "";
+  String  codeControl="";
   String   thisTable="";
   List<PmlCheck> myTables = []; //  only one Games
   String listAnswSql = "";
@@ -40,7 +41,7 @@ class _SqlPhlState extends State<SqlPhl> {
   int createMemeError = -1;
   int totalSeconds = 0;
   TextEditingController legendeController = TextEditingController();
-
+  TextEditingController  codeController = TextEditingController();
   String memeLegende = "";
   bool timeOut = false;
 
@@ -55,6 +56,7 @@ class _SqlPhlState extends State<SqlPhl> {
   @override
   void dispose() {
     legendeController.dispose();
+    codeController.dispose();
     super.dispose();
   }
 
@@ -120,13 +122,14 @@ class _SqlPhlState extends State<SqlPhl> {
 
   Future sendSQL() async {
     setState(() {
-      SendSqlState = false;
+      sendSqlState = false;
     });
 
     Uri url = Uri.parse(pathPHP + "manSQL.php");
 
     var data = {
       "MYSQL": sqlCommand,
+      "COTCOT":codeControl
     };
 
     http.Response response = await http.post(url, body: data);
@@ -139,13 +142,17 @@ class _SqlPhlState extends State<SqlPhl> {
       //listAnswSql=  jsonDecode(response.body ) ;
 
       setState(() {
-        SendSqlState = true;
+        sendSqlState = true;
       });
     }
   }
 
   Expanded getget() {
     setState(() {
+      codeController.text=codeControl;
+      codeController.selection = TextSelection.fromPosition(
+          TextPosition(offset: codeController.text.length));
+
       legendeController.text = sqlCommand;
       legendeController.selection = TextSelection.fromPosition(
           TextPosition(offset: legendeController.text.length));
@@ -153,6 +160,22 @@ class _SqlPhlState extends State<SqlPhl> {
     return Expanded(
         child: (Column(
       children: [
+        TextField(
+          controller: codeController,
+          keyboardType: TextInputType.multiline,
+          maxLines: 2,
+          decoration: const InputDecoration(
+            border: OutlineInputBorder(),
+            labelText: "Code",
+          ),
+          onChanged: (text) {
+            setState(() {
+           codeControl = text;
+              codeController.text = codeControl;
+
+            });
+          },
+        ),
         TextField(
           controller: legendeController,
           keyboardType: TextInputType.multiline,
@@ -250,10 +273,10 @@ class _SqlPhlState extends State<SqlPhl> {
                 setState(() {
                   cestCeluiLa = index;
 
-                  if (SendSqlState ==  true)
+                  if (sendSqlState ==  true)
                   {
                   sqlCommand ="";
-                  SendSqlState = false;
+                  sendSqlState = false;
                   } else {
                   sqlCommand = sqlCommand + myTables[index].pmlfield+ ' ,';
                   thisTable=myTables[index].pmltable;
@@ -266,7 +289,7 @@ class _SqlPhlState extends State<SqlPhl> {
   }
 
   Widget getRetour() {
-    if (!SendSqlState) {
+    if (!sendSqlState) {
       return (Text("..."));
     }
     return (Expanded(child:

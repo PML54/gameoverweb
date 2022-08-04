@@ -155,8 +155,7 @@ class _GameVotePipolState extends State<GameVotePipol> {
   Future resultUidGiven() async {
     Uri url = Uri.parse(pathPHP + "resultGameVoteUidGiven.php");
     resultGameVoteUidGiven = false;
-    print(" PhlCommons.thisGameCode.toString()," +
-        PhlCommons.thisGameCode.toString());
+
     var data = {
       "GAMECODE": PhlCommons.thisGameCode.toString(),
     };
@@ -174,11 +173,10 @@ class _GameVotePipolState extends State<GameVotePipol> {
   } // /u20224
 
   Expanded getListUidGiven() {
-    print("Error resultGameVoteUidGiven " + resultGameVoteUidGiven.toString());
+
 
     if (!resultGameVoteUidGiven) {
-      print(
-          "Error resultGameVoteUidGiven " + resultGameVoteUidGiven.toString());
+
       return (const Expanded(child: Text(".............")));
     }
     var listView = ListView.builder(
@@ -214,8 +212,7 @@ class _GameVotePipolState extends State<GameVotePipol> {
   Future resultUidReceived() async {
     Uri url = Uri.parse(pathPHP + "resultGameVoteUidReceived.php");
     resultGameVoteUidReceived = false;
-    print(" PhlCommons.thisGameCode.toString()," +
-        PhlCommons.thisGameCode.toString());
+
     var data = {
       "GAMECODE": PhlCommons.thisGameCode.toString(),
     };
